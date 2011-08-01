@@ -1,6 +1,38 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * ################################################################
+ *
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
+ *
+ * Copyright (C) 1997-2011 INRIA/University of
+ *                 Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ *
+ *  Initial developer(s):               The ActiveEon Team
+ *                        http://www.activeeon.com/
+ *  Contributor(s):
+ *
+ * ################################################################ 
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package ScreenSaver;
 
@@ -11,8 +43,6 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
-import java.lang.management.ThreadMXBean;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,7 +53,6 @@ import java.util.logging.Logger;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL; 
 
 /**
@@ -51,46 +80,91 @@ public class ClientJMX {
      */
     ArrayList<ChartData> datas;
 
+    /**
+     * return the JVM name focus by JMX.
+     * @return the JVMName object.
+     */
     public String getJVMName() {
         return JVMName;
     }
 
+    /**
+     * return the current task type (mainly : Native or Java).
+     * @return the CurrentTask object.
+     */
     public String getCurrentTask() {
         return currentTask;
     }
 
+    /**
+     * return the memory heap size in Mo.
+     * @return the MemHeap object.
+     */
     public long getMemHeap() {
         return memHeap;
     }
 
+    /**
+     * return the non memory heap size in Mo.
+     * @return the MemNonHeap object.
+     */
     public long getMemNonHeap() {
         return memNonHeap;
     }
 
+    /**
+     * return the operating system descriptor.
+     * @return OperatingSystem object.
+     */
     public String getOperatingSystem() {
         return operatingSystem;
     }
 
+    /**
+     * return the start time of the JVM focus by JMX.
+     * @return a string based on Date format.
+     */
     public String getStartTime() {
         return startTime;
     }
 
+    /**
+     * return the free memory of system in Mo.
+     * @return the FreeMemory object.
+     */
     public long getFreeMemory() {
         return freeMemory;
     }
 
+    /**
+     * return the physical memory of the system in Mo
+     * @return the TotalMemory object.
+     */
     public long getTotalMemory() {
         return totalMemory;
     }
 
+    /**
+     * return the free swap of system in Mo.
+     * @return the FreeSwap object.
+     */
     public long getFreeSwap() {
         return freeSwap;
     }
 
+    /**
+     * return the physical swap of the system in Mo
+     * @return the TotalMemory object.
+     */
     public long getTotalSwap() {
         return totalSwap;
     }
 
+    /**
+     * return an array which contain the series, loaded on a specific file in /tmp
+     * The first element is the timestamp of the event, and other values some informations, exemple : RAM value.
+     * @return an array of ChartData objects.
+     */ 
     public ArrayList<ChartData> getDatas() {
         return datas;
     }
@@ -114,7 +188,7 @@ public class ClientJMX {
     }
     
     /**
-     * Return system information
+     * Return a system information
      * @return The memory used currently by the system.
      */
     private long getMemoryUsed() {
@@ -144,7 +218,7 @@ public class ClientJMX {
     }
     
     /**
-     * Run jmx listenner
+     * Run JMX listener
      * @return True if the listen has runned, False if not.
      */
     public boolean runJmx(String dataFile) {
@@ -159,7 +233,6 @@ public class ClientJMX {
             JMXConnector jmxc = conn.getConnection();
             
             if(jmxc == null) {
-                System.out.println("1");
                 return false;
             }
 
@@ -190,7 +263,9 @@ public class ClientJMX {
                     }
             }
             this.totalMemory = mxbean.getTotalPhysicalMemorySize() / (1024*1024);
-            this.freeMemory = totalMemory - getMemoryUsed();
+            long mem = getMemoryUsed();
+            if (mem == 0) return false;
+            this.freeMemory = totalMemory - mem;
             this.totalSwap = mxbean.getTotalSwapSpaceSize() / (1024*1024);
             this.freeSwap = mxbean.getFreeSwapSpaceSize() / (1024*1024);
             this.memHeap = memHeapTmp / (1024*1024);
@@ -213,7 +288,6 @@ public class ClientJMX {
             }
 
             if(conn.closeConnection() == false) {
-                System.out.println("2");
                 return false;
             }
             
