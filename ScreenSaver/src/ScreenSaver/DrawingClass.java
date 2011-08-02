@@ -53,14 +53,14 @@ public class DrawingClass{
     
     private int GRAPHIC_LENGTH = 800;
     private int GRAPHIC_HEIGHT = 600; 
-    private int BORDER_L_R = 10;
+    private int BORDER_L_R = 50;
     private int PAD_TOP = 200;
     private int PAD_BOTTOM = 100;
     
     private int MID_Aera1_Aera2 = GRAPHIC_LENGTH/3;
     
-    private int Clock_X = 160;
-    private int Clock_Y = 120;
+    private int Clock_X = 180;
+    private int Clock_Y = 140;
     
     private int Error_X = 300;
     private int Error_Y = 300;
