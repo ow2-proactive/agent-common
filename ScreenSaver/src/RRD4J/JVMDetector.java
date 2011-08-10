@@ -21,7 +21,7 @@ import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
 
 /**
- * @author KWang
+ * @author pgouttef
  * 
  */
 public class JVMDetector {

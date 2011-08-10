@@ -50,9 +50,7 @@ import javax.swing.ImageIcon;
 
 public class ScreenSaver {
     
-    public static void createBMP( String fileName , String dataFile , int x , int y ) {
-        
-        System.out.println("Starting screensaver..");
+    public static Graphics2D init(Graphics2D g , int x , int y) {
         
         URL imageURL = ScreenSaver.class.getResource("ActiveEon.png");
         ImageIcon icon = null;
@@ -60,16 +58,10 @@ public class ScreenSaver {
             icon = new ImageIcon(imageURL);
         }
         
-        BufferedImage bitmap = new BufferedImage(x, y, BufferedImage.TYPE_3BYTE_BGR);
-        DrawingClass draw = new DrawingClass(bitmap.getWidth(),bitmap.getHeight() , dataFile);
-
-
-
-        //BufferedImage bitmap = new BufferedImage(sizeX, sizeY, BufferedImage.TYPE_3BYTE_BGR);
-        Graphics2D g = bitmap.createGraphics();
-
         g.setPaint( Color.BLACK );
         g.drawRect(0, 0, x, y);
+        
+        g.drawImage(icon.getImage(), 30, 30, null);
         
         String copyright1 =  "Copyright (C) 1997-2011 INRIA/University of";
         String copyright2 =  "Nice-Sophia Antipolis/ActiveEon";
@@ -77,13 +69,24 @@ public class ScreenSaver {
         g.drawString( copyright1 , 30 , y-30 );
         g.drawString( copyright2 , 108 , y-15 );
         g.drawImage(icon.getImage(), 30, 30, null);
-
-
+        
         g.setFont( new Font("Arial" , Font.PLAIN , 12));
         g.addRenderingHints( new RenderingHints( 
                 RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON));
-
-        draw.paint(g);
+        
+        return g;
+    }
+    
+    public static void createBMP( String fileName , String dataFile , int x , int y ) {
+        
+        System.out.println("Starting screensaver..");
+        
+        BufferedImage bitmap = new BufferedImage(x, y, BufferedImage.TYPE_3BYTE_BGR);
+        Graphics2D g = bitmap.createGraphics();
+        g = init(g, x, y);
+        
+        DrawingClass draw = new DrawingClass(g,bitmap.getWidth(),bitmap.getHeight() , dataFile);
+        draw.paint();
 
         g.dispose();
 

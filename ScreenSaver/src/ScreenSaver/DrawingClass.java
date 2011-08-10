@@ -51,6 +51,7 @@ public class DrawingClass{
     /*
      * The chart. Display the events list on the screen. All coordonate are generated dynamically.
      */
+    private Graphics2D g;
     
     private int GRAPHIC_LENGTH = 800;
     private int GRAPHIC_HEIGHT = 600; 
@@ -69,58 +70,74 @@ public class DrawingClass{
     private ClientJMX clientJMX = new ClientJMX();
     private boolean isJMXRunning = false;
     
-    /*
-     * Constructor
-     */
-    public DrawingClass(String dataFile) throws HeadlessException {
-        isJMXRunning = clientJMX.runJmx(dataFile);
-    }
+    /* BackGround */
+    private int Zone1X;
+    private int Zone1SizeX;
+    private int Zone1Y;
+    private int Zone1SizeY;
+        
+    private int Zone2X;
+    private int Zone2SizeX;
+    private int Zone2Y;
+    private int Zone2SizeY;
+    
+    private String dataFile;
+    private ChartAera chartAera;
+    private DataAera dataAera;
     
     /*
      * Constructor
      */
-    public DrawingClass(int sizeX , int sizeY , String dataFile) throws HeadlessException {
+    public DrawingClass(Graphics2D g, int sizeX , int sizeY , String dataFile) throws HeadlessException {
+        
+        this.g = g;
         
         GRAPHIC_LENGTH = sizeX;
         GRAPHIC_HEIGHT = sizeY; 
         MID_Aera1_Aera2 = GRAPHIC_LENGTH/3;
         
-        isJMXRunning = clientJMX.runJmx(dataFile);
+        /* BackGround */
+        Zone1X = MID_Aera1_Aera2;
+        Zone1SizeX = GRAPHIC_LENGTH - BORDER_L_R - Zone1X;
+        Zone1Y = GRAPHIC_HEIGHT - PAD_BOTTOM;
+        Zone1SizeY = GRAPHIC_HEIGHT - PAD_TOP - PAD_BOTTOM;
+
+        Zone2X = BORDER_L_R;
+        Zone2SizeX = -(Zone1SizeX - GRAPHIC_LENGTH) - 2 * BORDER_L_R;
+        Zone2Y = PAD_TOP;
+        Zone2SizeY = GRAPHIC_HEIGHT - PAD_TOP - PAD_BOTTOM;
+        
+        /* Chart Aera */
+        chartAera = new ChartAera(
+                g, Zone1X, Zone1Y, Zone1SizeX, Zone1SizeY , clientJMX);
+
+        /* Data Aera */
+        dataAera = new DataAera(
+                g, Zone2X, Zone2Y, Zone2SizeX, Zone2SizeY , chartAera.getTitleFont() , clientJMX );
+        
+        this.dataFile = dataFile;
     }
     
-    public void paint(Graphics2D g) {
+    public void paint() {
         
-        drawClock(g);
+        drawClock();
         
-        /* BackGround */
-        int Zone1X = MID_Aera1_Aera2;
-        int Zone1SizeX = GRAPHIC_LENGTH - BORDER_L_R - Zone1X;
-        int Zone1Y = GRAPHIC_HEIGHT - PAD_BOTTOM;
-        int Zone1SizeY = GRAPHIC_HEIGHT - PAD_TOP - PAD_BOTTOM;
-        
-        int Zone2X = BORDER_L_R;
-        int Zone2SizeX = -(Zone1SizeX - GRAPHIC_LENGTH) - 2 * BORDER_L_R;
-        int Zone2Y = PAD_TOP;
-        int Zone2SizeY = GRAPHIC_HEIGHT - PAD_TOP - PAD_BOTTOM;
-        
+        isJMXRunning = clientJMX.runJmx(dataFile);
         if(isJMXRunning) {
            
             /* Chart Aera */
-            ChartAera chartAera = new ChartAera(
-                    g, Zone1X, Zone1Y, Zone1SizeX, Zone1SizeY , clientJMX);
             chartAera.paint();
 
             /* Data Aera */
-            DataAera dataAera = new DataAera(
-                    g, Zone2X, Zone2Y, Zone2SizeX, Zone2SizeY , chartAera.getTitleFont() , clientJMX );
             dataAera.paint();
+        
         } else {
             g.drawString("No signal on JMX port...", 
                 Error_X , Error_Y);
         }
     }
     
-    private void drawClock(Graphics2D g) {
+    private void drawClock() {
         g.setPaint( Color.white );
         Calendar cal = Calendar.getInstance();
         g.drawString(cal.get(Calendar.HOUR_OF_DAY)+"h "+cal.get(Calendar.MINUTE)+"m et "+cal.get(Calendar.SECOND)+"s", 

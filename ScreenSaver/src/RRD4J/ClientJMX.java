@@ -36,10 +36,6 @@
  */
 package RRD4J;
 
-import RRD4J.JVMDetector;
-import RRD4J.ChartData;
-import RRD4J.DataBase;
-import RRD4J.DataBaseRrd4j;
 import com.sun.management.OperatingSystemMXBean;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -268,7 +264,7 @@ public class ClientJMX {
     private String parseName(String name) {
         
         String[] n = name.split(" ");
-        if(n[0].contains("/")) {
+        if(n[0].contains( System.getProperty("file.separator"))) {
             n = n[0].split("/");
             n = n[n.length -1].split("\\.");
             
