@@ -36,6 +36,7 @@
  */
 package ScreenSaver;
 
+import RRD4J.ClientJMX;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.HeadlessException;
@@ -53,7 +54,7 @@ public class DrawingClass{
     
     private int GRAPHIC_LENGTH = 800;
     private int GRAPHIC_HEIGHT = 600; 
-    private int BORDER_L_R = 50;
+    private int BORDER_L_R = 80;
     private int PAD_TOP = 200;
     private int PAD_BOTTOM = 100;
     
@@ -66,13 +67,13 @@ public class DrawingClass{
     private int Error_Y = 300;
     
     private ClientJMX clientJMX = new ClientJMX();
-    private boolean isJMXRunning;
+    private boolean isJMXRunning = false;
     
     /*
      * Constructor
      */
     public DrawingClass(String dataFile) throws HeadlessException {
-        clientJMX.runJmx(dataFile);
+        isJMXRunning = clientJMX.runJmx(dataFile);
     }
     
     /*

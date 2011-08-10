@@ -36,6 +36,7 @@
  */
 package ScreenSaver;
 
+import RRD4J.ClientJMX;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -115,18 +116,24 @@ public class DataAera {
         
         g.drawString("Operating System : " + clientJMX.getOperatingSystem(), Zone2X + startTextX, Zone2Y + 2*startTextY);
         
-        g.drawString("JVM name : " + clientJMX.getJVMName(), Zone2X + startTextX, Zone2Y + startTextY + 4*sizeLine);
-        g.drawString("JVM start at : " + clientJMX.getStartTime(), Zone2X + startTextX, Zone2Y + startTextY + 5*sizeLine);
+        g.drawString("Current Task Type : " + clientJMX.getCurrentTask(), Zone2X + startTextX, Zone2Y + startTextY + 4*sizeLine);
         
-        g.drawString("Total memory : " + clientJMX.getTotalMemory() + " Mo", Zone2X + startTextX, Zone2Y + startTextY + 7*sizeLine);
-        g.drawString("Free memory  : " + clientJMX.getFreeMemory() + " Mo", Zone2X + startTextX, Zone2Y + startTextY + 8*sizeLine);
-        g.drawString("Total swap : " + clientJMX.getTotalSwap() + " Mo", Zone2X + startTextX, Zone2Y + startTextY + 9*sizeLine);
-        g.drawString("Free swap  : " + clientJMX.getFreeSwap() + " Mo", Zone2X + startTextX, Zone2Y + startTextY + 10*sizeLine);
+        g.drawString("Total memory : " + clientJMX.getTotalMemory() + " Mo", Zone2X + startTextX, Zone2Y + startTextY + 6*sizeLine);
+        g.drawString("Free memory  : " + clientJMX.getFreeMemory() + " Mo", Zone2X + startTextX, Zone2Y + startTextY + 7*sizeLine);
+        g.drawString("Total swap : " + clientJMX.getTotalSwap() + " Mo", Zone2X + startTextX, Zone2Y + startTextY + 8*sizeLine);
+        g.drawString("Free swap  : " + clientJMX.getFreeSwap() + " Mo", Zone2X + startTextX, Zone2Y + startTextY + 9*sizeLine);
         
-        g.drawString("Memory : ", Zone2X + startTextX, Zone2Y + startTextY + 12*sizeLine);
-        g.drawString("Heap        : " + clientJMX.getMemHeap() + " Mo", Zone2X + startTextX +10, Zone2Y + startTextY + 13*sizeLine);
-        g.drawString("Non Heap : " + clientJMX.getMemNonHeap() + " Mo", Zone2X + startTextX+10, Zone2Y + startTextY + 14*sizeLine);
+        g.drawString("Memory : ", Zone2X + startTextX, Zone2Y + startTextY + 11*sizeLine);
+        g.drawString("Heap        : " + clientJMX.getMemHeap() + " Mo", Zone2X + startTextX +10, Zone2Y + startTextY + 12*sizeLine);
+        g.drawString("Non Heap : " + clientJMX.getMemNonHeap() + " Mo", Zone2X + startTextX +10, Zone2Y + startTextY + 13*sizeLine);
         
-        g.drawString("Current Task Type : " + clientJMX.getCurrentTask(), Zone2X + startTextX, Zone2Y + startTextY + 16*sizeLine);
+        g.drawString("Nb JVM scanned : " + clientJMX.getNbJVM(), Zone2X + startTextX, Zone2Y + startTextY + 15*sizeLine);
+        for(int i=0 ; i < clientJMX.getJVMNames().size() ; ++i) {
+            g.drawString(i + ") " + clientJMX.getJVMNames().get(i), Zone2X + startTextX +10, Zone2Y + startTextY + (16+i)*sizeLine);
+        }
+        
+        
+        
+        
     }
 }

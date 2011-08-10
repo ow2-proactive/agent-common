@@ -36,26 +36,11 @@
  */
 package ScreenSaver;
 
+import RRD4J.ClientJMX;
+import RRD4J.DataBaseRrd4j;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.axis.DateTickUnit;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.StandardXYItemRenderer;
-import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.data.time.Millisecond;
-import org.jfree.data.time.TimeSeries;
-import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.data.xy.XYDataset;
 
 /**
  *
@@ -71,6 +56,9 @@ public class ChartAera {
     private int Zone1Y;
     private int Zone1SizeY;
     
+    private int sizeLegendX = 91;
+    private int sizeLegendY = 73;
+    
     //Context colors
     private Color colorBackground = Color.white;
     private Color colorText = Color.black;
@@ -80,10 +68,14 @@ public class ChartAera {
     private Color colorOrange = new Color(0xe7, 0x74 , 0x24);
     
     //Font of chart title
-    private Font titleFont;
+    private Font titleFont = new Font("Arial", Font.BOLD, 17);
     
     //Client JMX object
     private ClientJMX clientJMX;
+    
+    //SYSTEM and JVM ariables
+    private int SYSTEM = new DataBaseRrd4j().SYSTEM;
+    private int JVM = new DataBaseRrd4j().JVM;
 
     /**
      * Constructor with parameters.
@@ -118,124 +110,19 @@ public class ChartAera {
     }
     
     /**
-     * This method create the database store in ClientJMX object under the format : ArrayList< ChartData >
-     * 
-     * @return XYDataset object.
-     */
-    private XYDataset createDataset() {
-
-        final TimeSeriesCollection dataset = new TimeSeriesCollection();
-        dataset.setDomainIsPointsInTime(true);
-        
-        
-        ArrayList<ChartData> datas = clientJMX.getDatas();
-        Calendar cal = Calendar.getInstance();
-        
-        /*
-         * RAM SERIE
-         */
-        final TimeSeries s1 = new TimeSeries("RAM", Millisecond.class);
-        for (ChartData chartData : datas) {
-            Date date = new Date(chartData.getTime());
-            cal.setTime(date);
-            s1.add( new Millisecond(date) , 100*chartData.getRAM()/clientJMX.getTotalMemory());
-        }
-        
-        /*
-         * Swap SERIE
-         */
-        final TimeSeries s2 = new TimeSeries("Swap", Millisecond.class);
-        for (ChartData chartData : datas) {
-            Date date = new Date(chartData.getTime());
-            cal.setTime(date);
-            s2.add( new Millisecond(date) , 100*chartData.getSwap()/clientJMX.getTotalMemory());
-        }
-        
-        dataset.addSeries(s1);
-        dataset.addSeries(s2);
-
-        return dataset;
-
-    }
-    
-    /**
-     * Create a specific value axis for pourcent format.
-     * @param title String object
-     * @return ValueAxis object
-     */
-    private ValueAxis createRangeAxis(String title) {
-        ValueAxis axe = new NumberAxis(title);
-        
-        axe.setLowerBound(0);
-        axe.setUpperBound(100);
-        
-        return axe;
-    }
-    
-    /**
-     * Create a specific and dynamic domain axis for time format.
-     * @param title String object
-     * @return ValueAxis object
-     */
-    private DateAxis createDomainAxis(String title) {
-        DateAxis axe = new DateAxis(title);
-        
-        axe.setVerticalTickLabels(true);
-        
-        int size = clientJMX.getDatas().size();
-        if(size < 5){
-            axe.setTickUnit( new DateTickUnit(DateTickUnit.SECOND, 1));
-        } else if(size < 20) {
-            axe.setTickUnit( new DateTickUnit(DateTickUnit.SECOND, 5));
-        } else if(size < 50) {
-            axe.setTickUnit( new DateTickUnit(DateTickUnit.SECOND, 20));
-        } else if(size < 150) {
-            axe.setTickUnit( new DateTickUnit(DateTickUnit.MINUTE, 1));
-        } else if(size < 300) {
-            axe.setTickUnit( new DateTickUnit(DateTickUnit.MINUTE, 2));
-        } else {
-            axe.setTickUnit( new DateTickUnit(DateTickUnit.MINUTE, 5));
-        }
-        
-        axe.setDateFormatOverride(new SimpleDateFormat("hh:mm:ss"));
-        axe.setLowerMargin(0.1);
-        axe.setUpperMargin(0.1);
-        
-        return axe;
-    }
-    
-    /**
      * Main method which will draw the chart.
      */
     private void drawChart() {
         
-        String title    = "data visualization";
-        String domain   = "time";
-        String range    = "memory";
-        
-        final XYDataset dataset = createDataset();
-        final XYItemRenderer renderer = new StandardXYItemRenderer();
-        renderer.setBasePaint( colorOrange );
-        
-        final XYPlot plot = new XYPlot(dataset, createDomainAxis(domain), 
-                createRangeAxis(range), renderer);
-        
-        plot.setBackgroundPaint( Color.lightGray);
-        plot.setDomainGridlinePaint( colorBlue );
-        plot.setRangeGridlinePaint( colorBlue );
-        plot.setDomainCrosshairVisible(true);
-        
-        
-        final JFreeChart chart = new JFreeChart(title, plot);
-        
-        BufferedImage buff = chart.createBufferedImage(Zone1SizeX, Zone1SizeY);
-        g.drawImage(buff, Zone1X, Zone1Y - Zone1SizeY, null);
-        titleFont = chart.getTitle().getFont();
+        int midY = Zone1Y - Zone1SizeY/2; 
+        clientJMX.getDataBase().setSize(Zone1SizeX - sizeLegendX, Zone1SizeY/2 -sizeLegendY);
+        g.drawImage(clientJMX.getDataBase().createGraphic(SYSTEM, "System informations"), null, Zone1X, Zone1Y - Zone1SizeY);
+        g.drawImage(clientJMX.getDataBase().createGraphic(JVM , "JVMs informations"), null, Zone1X, midY);
     }
-    
+
     /**
-     * Return the font instance of the chart title generate by JFreeChart.
-     * @return the title font in Font type.
+     * return the title Font.
+     * @return the title font.
      */
     public Font getTitleFont() {
         return titleFont;

@@ -34,47 +34,40 @@
  * ################################################################ 
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package ScreenSaver;
+package RRD4J;
 
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXConnectorFactory;
-import javax.management.remote.JMXServiceURL;
+import java.awt.Color;
 
 /**
  *
  * @author pgouttef
  */
-public class JMXConnection {
+public class ChartData {
     
-    private JMXServiceURL url;
-    JMXConnector conn = null;
-    
-    public JMXConnection(JMXServiceURL url) {
-        this.url = url;
+    //datas for chart
+    private String dataSourceName;
+    private Color color;
+
+    public ChartData(String dataSourcename, Color color) {
+        this.dataSourceName = dataSourcename;
+        this.color = color;
     }
     
-    public JMXConnector getConnection() {
-        try {
-            conn = JMXConnectorFactory.connect(url, null);
-            return conn;
-        } catch (IOException ex) {
-            return null;
-        }
+    public Color getColor() {
+        return color;
     }
-    
-    public boolean closeConnection() {
-        if(conn!=null) {
-            try {
-                conn.close();
-                return true;
-            } catch (IOException ex) {
-                return false;
-            }
-        }
-        return false;
+
+    public void setColor(Color color) {
+        this.color = color;
     }
+
+    public String getDataSourceName() {
+        return dataSourceName;
+    }
+
+    public void setDataSourceName(String dataSourceName) {
+        this.dataSourceName = dataSourceName;
+    }
+
     
 }

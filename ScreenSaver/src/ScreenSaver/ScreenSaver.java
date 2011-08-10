@@ -44,8 +44,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -63,7 +61,6 @@ public class ScreenSaver {
         }
         
         BufferedImage bitmap = new BufferedImage(x, y, BufferedImage.TYPE_3BYTE_BGR);
-
         DrawingClass draw = new DrawingClass(bitmap.getWidth(),bitmap.getHeight() , dataFile);
 
 
@@ -86,35 +83,34 @@ public class ScreenSaver {
         g.addRenderingHints( new RenderingHints( 
                 RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON));
 
-        //g.setColor( draw.getBackgroundColor() );
-        //g.fillRect(0, 0, bitmap.getWidth(), bitmap.getHeight());
         draw.paint(g);
 
         g.dispose();
 
         try {
-                    ImageIO.write(bitmap, "bmp", new File( fileName ));
+                ImageIO.write(bitmap, "bmp", new File( fileName ));
             } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                e.printStackTrace();
             }
             
         } 
     
     public static void main( String[] argv ) {
+            
+        //System.out.println("java home : " + System.getProperty("java.home"));
         
         String imgFile;
         String dataFile;
         int x,y;
         if(argv.length == 4) {
-            
+
             imgFile = argv[0];
             dataFile = argv[1];
             x = Integer.parseInt(argv[2]);
             y = Integer.parseInt(argv[3]);
-            
+
             ScreenSaver.createBMP( imgFile , dataFile , x , y );
-            
+
         }
     }
 }
