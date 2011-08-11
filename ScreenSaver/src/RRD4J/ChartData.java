@@ -40,7 +40,7 @@ import java.awt.Color;
 
 /**
  *
- * @author pgouttef
+ * @author philippe Gouttefarde
  */
 public class ChartData {
     

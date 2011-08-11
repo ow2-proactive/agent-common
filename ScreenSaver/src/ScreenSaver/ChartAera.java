@@ -44,7 +44,7 @@ import java.awt.Graphics2D;
 
 /**
  *
- * @author pgouttef
+ * @author philippe Gouttefarde
  */
 public class ChartAera {
     

@@ -63,7 +63,7 @@ import javax.management.remote.JMXConnector;
 
 /**
  *
- * @author pgouttef
+ * @author philippe Gouttefarde
  */
 public class ClientJMX {
     

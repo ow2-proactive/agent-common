@@ -48,6 +48,11 @@ import java.net.URL;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
+/**
+ *
+ * @author philippe Gouttefarde
+ */
+
 public class ScreenSaver {
     
     /**
