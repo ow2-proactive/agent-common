@@ -26,6 +26,7 @@ import com.sun.tools.attach.VirtualMachine;
  */
 public class JVMDetector {
 
+   
    private  String sep =  System.getProperty("file.separator");
 	
    private  String path;
@@ -34,32 +35,23 @@ public class JVMDetector {
    
    private enum STATUS{enabled, notEnalbed, willBeEnabled};
    
+   
+   // The pid list of the JVMs.
    private ArrayList<String> pidTab = new ArrayList<String>();
+   // 2 maps to the detection process.
    private Map processes = null;
    private Map jmx = null;
    
+   /**
+    * getter of the PID list.
+    * @return a ArrayList of PID.
+    */
    public ArrayList<String> getPidTab() {
 	   return pidTab;
    }
 
-    public void setPidTab(ArrayList<String> pidTab) {
-            this.pidTab = pidTab;
-    }
-
-    public Map getJmx() {
-            return jmx;
-    }
-
-    public void setJmx(Map jmx) {
-            this.jmx = jmx;
-    }
-
     public Map getProcesses() {
             return processes;
-    }
-
-    public void setProcesses(Map processes) {
-            this.processes = processes;
     }
 
     private void initPath() {
@@ -67,44 +59,53 @@ public class JVMDetector {
             path += sep + ".." + sep + "bin" + sep;
     }
    
+    /**
+     * The method launch the scanning process to detects all JVM running on the system.
+     */
    public void scan() {
 	   	
-	   	initPath();
-	   	// first round: get all process info.
+        initPath();
+        // first round: get all process info.
         // process id is the key, name of the process is the value
         // name includes full package name for the application's main class
         // or the full path name to the application's JAR file
         // along with the arguments passed to the main method
-		try {
-			processes = getProcessesMap();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+        try {
+                processes = getProcessesMap();
+        } catch (IOException e) {
+                e.printStackTrace();
+        }
 
         // second round: detect if jmx is enabled
         // process id is the key, whether the process is jmx enabled is the
         // value
 	jmx = detectJMXAgent(processes.keySet());
 
-        displayInfos(processes, jmx);
+        setPIDList(processes, jmx);
    }
    
-   private void displayInfos(Map processes, Map jmx){
+   /**
+    * set the PID list.
+    * 
+    * @param processes The running JAVA process map.
+    * @param jmx The jmx connectors map.
+    */
+   private void setPIDList(Map processes, Map jmx){
    	
    		for (Object object : jmx.entrySet().toArray()) {
    		
 	   		String[] tmp = object.toString().split("=");
 	   		String key = tmp[0];
-	   		String status = tmp[1];
 	   		
 	   		pidTab.add(key);
-	   		
-	   		/*System.out.println("********************************************");
-	   		System.out.println("Name : " + processes.get( key ));
-	   		System.out.println("Info : " + status + "(" + key + ")");*/
 		}
    }
 
+   /**
+    * debug method to display process status.
+    * @param value The value to test.
+    * @return the value in String format.
+    */
    private String getString(STATUS value) {
        switch (value) {
            case enabled:
@@ -117,6 +118,11 @@ public class JVMDetector {
        }
    }
 
+   /**
+    * Construct the jmx map.
+    * @param processids set.
+    * @return the jmx map.
+    */
    private Map detectJMXAgent(Set processids) {
         BufferedReader br = null;
         Map jmx = new TreeMap();
@@ -156,6 +162,11 @@ public class JVMDetector {
         }
    }
 
+   /**
+    * Construct the process map.
+    * @return the process map.
+    * @throws IOException 
+    */
    private Map getProcessesMap() throws IOException {
        Map processes = new TreeMap();
        Runtime rt = Runtime.getRuntime();
@@ -175,6 +186,12 @@ public class JVMDetector {
        }
        return processes;
    }
+   
+   /**
+    * return a jmx connector specific to the java process id.
+    * @param id The id of java application.
+    * @return the jmx connector
+    */
    public JMXConnector getJMXConnector(String id) {
 	   
           // attach to the target application
@@ -216,14 +233,4 @@ public class JVMDetector {
                 return null;
         }
    }
-   
-    /**
-     * @param args
-     * @throws IOException
-     */
-    public static void main(String[] args) throws IOException {
-    	
-        JVMDetector jvm = new JVMDetector();
-        jvm.scan();
-    }
 }

@@ -48,6 +48,7 @@ import java.awt.Graphics2D;
  */
 public class ChartAera {
     
+    //The graphics support on which we will draw.
     private Graphics2D g;
     
     /* Chart Aera */
@@ -66,9 +67,6 @@ public class ChartAera {
     //ProActive colors
     private Color colorBlue = new Color(0x1d, 0x30 , 0x6b);
     private Color colorOrange = new Color(0xe7, 0x74 , 0x24);
-    
-    //Font of chart title
-    private Font titleFont = new Font("Arial", Font.BOLD, 17);
     
     //Client JMX object
     private ClientJMX clientJMX;
@@ -110,21 +108,14 @@ public class ChartAera {
     }
     
     /**
-     * Main method which will draw the chart.
+     * Main method which will draw the charts.
      */
     private void drawChart() {
         
         int midY = Zone1Y - Zone1SizeY/2; 
         clientJMX.getDataBase().setSize(Zone1SizeX - sizeLegendX, Zone1SizeY/2 -sizeLegendY);
+        
         g.drawImage(clientJMX.getDataBase().createGraphic(SYSTEM, "System informations"), null, Zone1X, Zone1Y - Zone1SizeY);
         g.drawImage(clientJMX.getDataBase().createGraphic(JVM , "JVMs informations"), null, Zone1X, midY);
-    }
-
-    /**
-     * return the title Font.
-     * @return the title font.
-     */
-    public Font getTitleFont() {
-        return titleFont;
     }
 }

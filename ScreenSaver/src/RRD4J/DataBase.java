@@ -14,10 +14,13 @@ import java.awt.image.BufferedImage;
 public interface DataBase {
     
     /**
-     * Create a new database.
+     * Create a complete database with data sources name.
      * 
-     * @param path Path of the db file.
-     * @param dbName Name of the future database.
+     * @param path the file path of db.
+     * @param dbNameSystem array of data source name for system informations.
+     * @param dbNameJVM array of data source name for JVM informations.
+     * @param color array of color line.
+     * @return true if all is good, false if not.
      */
     public boolean createDB(String path,String[] dbNameSystem, String[] dbNameJVM , Color[] color);
     
@@ -29,11 +32,15 @@ public interface DataBase {
     public void deleteDB(String path);
     
     /**
-     * Add a new value to the specific database.
+     * update the database with news values.
      * 
-     * @param path Path of the database.
-     * @param dbName Name of the database. 
-     * @param value Value to add.
+     * @param path the file path of db.
+     * @param dbNameSystem array of data source name for system informations.
+     * @param valueSystem array of system values.
+     * @param dbNameJVM array of data source name for JVM informations.
+     * @param valueJVMs array of JVM values.
+     * @param color array of color line.
+     * @return true if all is good, false if not.
      */
     public boolean addValue(String path,
             String[] dbSystem, double[] valueSystem,
@@ -41,7 +48,11 @@ public interface DataBase {
             Color[] colors);
     
     /**
-     * Generate graphic with all database that the class know.
+     * Generate graphic of system informations or JVMs informations.
+     * 
+     * @param type 0 for system, 1 for JVMs.
+     * @param title The title of the chart.
+     * @return a BufferedImage containing the graph. 
      */
     public BufferedImage createGraphic(int type , String title);
     

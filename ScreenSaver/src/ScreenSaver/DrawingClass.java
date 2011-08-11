@@ -113,11 +113,14 @@ public class DrawingClass{
 
         /* Data Aera */
         dataAera = new DataAera(
-                g, Zone2X, Zone2Y, Zone2SizeX, Zone2SizeY , chartAera.getTitleFont() , clientJMX );
+                g, Zone2X, Zone2Y, Zone2SizeX, Zone2SizeY , clientJMX );
         
         this.dataFile = dataFile;
     }
     
+    /**
+     *  The first method, the graphic begin here.
+     */
     public void paint() {
         
         drawClock();
@@ -137,6 +140,9 @@ public class DrawingClass{
         }
     }
     
+    /**
+     * Display current time on the screensaver.
+     */
     private void drawClock() {
         g.setPaint( Color.white );
         Calendar cal = Calendar.getInstance();

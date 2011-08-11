@@ -80,9 +80,21 @@ public class ClientJMX {
     private long totalSwap;
     private long freeSwap;
     private int nbJVM = 0;
+    
+    private String dataBaseFile = "database.rrd";
+    
+    // image on which we will draw the charts.
     private BufferedImage img = null;
+    // database manager
     private DataBase rrd4j = new DataBaseRrd4j();
     
+    /**
+     * Concatenate at end of JVMName for identical names.
+     */
+    private int debugName = 0;
+    private int nbJVMvoid = 0;
+    
+    // the JVMs detector and connector
     private JVMDetector JVMdetector = new JVMDetector();
     
     /**
@@ -91,7 +103,13 @@ public class ClientJMX {
     private ArrayList<String> JVMNames = new ArrayList<String>();
     private Color[] colorList = null;
 
+    /**
+     * Default constructor. it initialize some colors for the charts.
+     */
     public ClientJMX() {
+        /*
+         * Initialisation of some colors.
+         */
         colorList = new Color[10];
         
         colorList[0] = Color.BLACK;
@@ -104,10 +122,6 @@ public class ClientJMX {
         colorList[7] = Color.RED;
         colorList[8] = Color.YELLOW;
         colorList[9] = Color.LIGHT_GRAY;
-        
-        /*for(int i = 0; i < 16 ; ++i) {
-            JVMColors.set(i, new Color(rand.nextFloat(), rand.nextFloat(), rand.nextFloat()) );
-        }*/
     }
     
     /**
@@ -254,6 +268,10 @@ public class ClientJMX {
         return 0;
     }
     
+    /**
+     * debug method to display a String tab
+     * @param tab 
+     */
     private void displayTab(String[] tab) {
         System.out.println("\ntab : ");
         for (String string : tab) {
@@ -261,6 +279,12 @@ public class ClientJMX {
         }
     }
     
+    /**
+     * This method parses the complete name of a JVM and return the executable name 
+     * (it removes the path and optional parameters)
+     * @param name
+     * @return 
+     */
     private String parseName(String name) {
         
         String[] n = name.split(" ");
@@ -288,19 +312,18 @@ public class ClientJMX {
         }
     }
     
+    /**
+     * This method updates database with the news informations system.
+     * @param path The path of the database in the system.
+     * @param JVMMemory memory information of each JVM.
+     */
     public void updateRrd4j(String path , double[] JVMMemory ) {
-        
-        /**
-         * Initialization path.
-         */
-        int SYSTEM = ((DataBaseRrd4j)rrd4j).SYSTEM;
-        int JVM = ((DataBaseRrd4j)rrd4j).JVM;
         
         if(!path.endsWith(System.getProperty("file.separator"))) {
             path += System.getProperty("file.separator");
         }
         
-        String databasePath = path + "database.rrd";
+        String databasePath = path + dataBaseFile;
         
         /**
          * Set system values.
@@ -347,6 +370,7 @@ public class ClientJMX {
             long memHeapTmp = 0, memNonHeapTmp=0;
             boolean check = false;
             double[] JVMMemory = null;
+            int rank = 0;
             
             /**
              * get Defaults informations on system.
@@ -395,20 +419,35 @@ public class ClientJMX {
                         memHeapTmp += memBean.getHeapMemoryUsage().getUsed();
                         memNonHeapTmp += memBean.getNonHeapMemoryUsage().getUsed();
                         
-                        JVMMemory[i] = memBean.getHeapMemoryUsage().getUsed() + memBean.getNonHeapMemoryUsage().getUsed();
-                        JVMMemory[i] = (JVMMemory[i] / this.totalMemory) * 100;
-                        JVMMemory[i] /= 1024*1024;
                         /*
                          * get back some information
                          */
                         if(mBeanRuntime != null) {
                             //System.out.println("****************************");
                             //System.out.println("name : " + parseName(JVMdetector.getProcesses().get( pid ).toString() ));
-                            this.JVMNames.add( parseName(JVMdetector.getProcesses().get( 
-                                    JVMdetector.getPidTab().get(i) ).toString() ));
-                            //for (String arg : mBeanRuntime.getInputArguments()) {
-                            //    System.out.println("arg : " + arg);
-                            //}
+                            
+                            String name = JVMdetector.getProcesses().get(JVMdetector.getPidTab().get(i) ).toString();
+                            
+                            if(!name.equals("")){
+                                
+                                if(this.JVMNames.contains(name)) {
+                                    name += (debugName++);
+                                }
+                                
+                                this.JVMNames.add( parseName( name ));
+                                
+                                JVMMemory[rank] = memBean.getHeapMemoryUsage().getUsed() + memBean.getNonHeapMemoryUsage().getUsed();
+                                JVMMemory[rank] = (JVMMemory[rank] / this.totalMemory) * 100;
+                                JVMMemory[rank] /= 1024*1024;
+                                
+                                rank++;
+                                //for (String arg : mBeanRuntime.getInputArguments()) {
+                                //    System.out.println("arg : " + arg);
+                                //}
+                            } else {
+                                JVMMemory = removeJVMofTab(JVMMemory, i);
+                                nbJVM--;
+                            } 
                         }
                         
                         /*
@@ -458,6 +497,29 @@ public class ClientJMX {
             Logger.getLogger(ClientJMX.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
+    }
+    
+    /**
+     * Remove a specific element of an array.
+     * @param tab the array
+     * @param rank the id of the element to remove.
+     * @return the new array
+     */
+    private double[] removeJVMofTab(double[] tab, int rank) {
+        
+        double[] tmp = new double[tab.length - 1];
+        int i = 0;
+        while(i < rank) {
+            tmp[i] = tab[i];
+            i++;
+        }
+        i++;
+        while(i<tab.length) {
+            tmp[i-1] = tab[i];
+            i++;
+        }
+        tab = tmp;
+        return tab;
     }
     
     public static void main(String[] args) {

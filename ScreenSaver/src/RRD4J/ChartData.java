@@ -48,23 +48,44 @@ public class ChartData {
     private String dataSourceName;
     private Color color;
 
+    /**
+     * Constructor with 2 parameters.
+     * @param dataSourcename Name of the dataSource.
+     * @param color Future line color on the chart.
+     */
     public ChartData(String dataSourcename, Color color) {
         this.dataSourceName = dataSourcename;
         this.color = color;
     }
     
+    /**
+     * getter of color
+     * @return color
+     */
     public Color getColor() {
         return color;
     }
 
+    /**
+     * setter of color
+     * @param color 
+     */
     public void setColor(Color color) {
         this.color = color;
     }
 
+    /**
+     * getter of data source name
+     * @return the name
+     */
     public String getDataSourceName() {
         return dataSourceName;
     }
 
+    /**
+     * setter of the data source name
+     * @param dataSourceName 
+     */
     public void setDataSourceName(String dataSourceName) {
         this.dataSourceName = dataSourceName;
     }

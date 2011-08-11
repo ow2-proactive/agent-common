@@ -42,15 +42,24 @@ public class DataBaseRrd4j implements DataBase {
     private int width;
     private long weekDuration = 604800L;
     private long halfHour = 1800L;
+    private long minute15Duration = 900L;
     private long minuteDuration = 60L;
     private long halfMinuteDuration = 30L;
     
-    private long currentDuration = minuteDuration;
+    private long currentDuration = minute15Duration;
     
+    /**
+     * Return the current timestamp in seconds.
+     * @return the number of seconds since 1-1-1970
+     */
     private long getTime() {
         return System.currentTimeMillis() / 1000;
     }
 
+    /**
+     * delete the database.
+     * @param path The path of the databse.
+     */
     @Override
     public void deleteDB(String path) {
         
@@ -60,6 +69,11 @@ public class DataBaseRrd4j implements DataBase {
         }
     }
 
+    /**
+     * check if the data source exist in the JVM database.
+     * @param datasource The name of the data source.
+     * @return true if it exists, false if not.
+     */
     private boolean dataSourceJVMExist(String datasource) {
         
         for (ChartData data: JVMDataSource) {
@@ -70,6 +84,11 @@ public class DataBaseRrd4j implements DataBase {
         return false;
     }
     
+    /**
+     * check if the data source exist in the system database.
+     * @param datasource The name of the data source.
+     * @return true if it exists, false if not.
+     */
     private boolean dataSourceSystemExist(String datasource) {
         
         for (ChartData data: systemDataSource) {
@@ -80,6 +99,10 @@ public class DataBaseRrd4j implements DataBase {
         return false;
     }
     
+    /**
+     * debug method which count data source in the database.
+     * @param path of the database.
+     */
     private void countDb(String path) {
         try {
             RrdDb rrdDb = new RrdDb(path);
@@ -93,6 +116,10 @@ public class DataBaseRrd4j implements DataBase {
         }
     }
 
+    /**
+     * debug method which display all data of a database.
+     * @param path of the database.
+     */
     public void displayValue(String path) {
         
         
@@ -116,41 +143,35 @@ public class DataBaseRrd4j implements DataBase {
         }
     }
 
+    /**
+     * setter of the graph path.
+     * @param path of the graph file, if we want to export it.
+     */
     @Override
     public void setGraphFile(String path) {
         this.graphPath = path;
     }
 
+    /**
+     * setter of dimensions graph.
+     * @param width
+     * @param height 
+     */
     @Override
     public void setSize(int width, int height) {
         this.height = height;
         this.width = width;
     }
-    
-    public static void main(String[] args) {
-        
-        String path = "test.rrd";
-        String graphPath = "graph.gif";
-        String dbName = "RAM";
-        
-        DataBase db = new DataBaseRrd4j();
-        
-        for(int i=0 ; i < 5 ; ++i) { 
-            try {
-                Thread.sleep(1000);
-                //db.addValue(((DataBaseRrd4j)db).SYSTEM, path, dbName, Color.RED ,i);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-          
-        ((DataBaseRrd4j)db).displayValue(path);
-        
-        db.setGraphFile(graphPath);
-        db.setSize(500, 800);
-        //db.createGraphic();
-    }
 
+    /**
+     * Create a complete database with data sources name.
+     * 
+     * @param path the file path of db.
+     * @param dbNameSystem array of data source name for system informations.
+     * @param dbNameJVM array of data source name for JVM informations.
+     * @param color array of color line.
+     * @return true if all is good, false if not.
+     */
     public boolean createDB(String path, String[] dbNameSystem, String[] dbNameJVM, Color[] color) {
         
         try {
@@ -192,8 +213,20 @@ public class DataBaseRrd4j implements DataBase {
         return true;
     }
 
+    /**
+     * update the database with news values.
+     * 
+     * @param path the file path of db.
+     * @param dbNameSystem array of data source name for system informations.
+     * @param valueSystem array of system values.
+     * @param dbNameJVM array of data source name for JVM informations.
+     * @param valueJVMs array of JVM values.
+     * @param color array of color line.
+     * @return true if all is good, false if not.
+     */
     public boolean addValue(String path, String[] dbSystem, double[] valueSystem, String[] dbJVMs, double[] valueJVMs, Color[] colors) {
         RrdDb rrdDb = null;
+        
         
         if(!new File(path).exists()) {
             createDB( path, dbSystem , dbJVMs , colors);
@@ -222,7 +255,7 @@ public class DataBaseRrd4j implements DataBase {
                 }
             }
             for (int i = 0; i < dbJVMs.length; i++) {
-                if(!dataSourceSystemExist(dbJVMs[i])) {
+                if(!dataSourceJVMExist(dbJVMs[i])) {
                     JVMDataSource.add(new ChartData(dbJVMs[i], colors[i+dbSystem.length]));
                 }
             }
@@ -246,6 +279,7 @@ public class DataBaseRrd4j implements DataBase {
                 val += ":" + d;
             }
             
+            
             sample.setAndUpdate(val);
             
             endTime = time;
@@ -258,6 +292,13 @@ public class DataBaseRrd4j implements DataBase {
         return true;
     }
 
+    /**
+     * Generate graphic of system informations or JVMs informations.
+     * 
+     * @param type 0 for system, 1 for JVMs.
+     * @param title The title of the chart.
+     * @return a BufferedImage containing the graph. 
+     */
     public BufferedImage createGraphic(int type , String title) {
         try{
             if(startTime==0L) {

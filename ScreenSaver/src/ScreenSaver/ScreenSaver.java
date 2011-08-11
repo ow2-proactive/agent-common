@@ -50,6 +50,14 @@ import javax.swing.ImageIcon;
 
 public class ScreenSaver {
     
+    /**
+     * Initialize the Graphics2D object with background,resources and copyright.
+     * 
+     * @param g the graphics2D object.
+     * @param x width of the picture.
+     * @param y height of the picture.
+     * @return The Graphics2D initialize.
+     */
     public static Graphics2D init(Graphics2D g , int x , int y) {
         
         URL imageURL = ScreenSaver.class.getResource("ActiveEon.png");
@@ -77,7 +85,18 @@ public class ScreenSaver {
         return g;
     }
     
-    public static void createBMP( String fileName , String dataFile , int x , int y ) {
+    /**
+     * The main method of the application. 
+     * It load resources, initialize the picture, launch JVM and rrd4j process.
+     * It generates some pictures and collapse their.
+     * Create a picture file in bmp format.
+     * 
+     * @param pictureFile The path where the picture will be create.
+     * @param dataFile The database path.
+     * @param x Width of the screen.
+     * @param y Height of the screen.
+     */
+    public static void createBMP( String pictureFile , String dataFile, int x, int y ) {
         
         System.out.println("Starting screensaver..");
         
@@ -91,12 +110,11 @@ public class ScreenSaver {
         g.dispose();
 
         try {
-                ImageIO.write(bitmap, "bmp", new File( fileName ));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            
-        } 
+                ImageIO.write(bitmap, "bmp", new File( pictureFile ));
+        } catch (IOException e) {
+        }
+
+    } 
     
     public static void main( String[] argv ) {
             

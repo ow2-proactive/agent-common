@@ -67,8 +67,9 @@ public class DataAera {
     private Color colorText = Color.black;
     
     //Font informations
-    private Font titleFont;
+    private Font titleFont = new Font("Arial", Font.BOLD, 17);
     private Font textFont = new Font("TimesRoman" , Font.PLAIN , 12);
+    private String title = "data center";
     
     //Client JMF instance to take back JVM informations and put them on graphics2D g.
     private ClientJMX clientJMX;
@@ -84,17 +85,18 @@ public class DataAera {
      * @param titleFont
      * @param clientJMX 
      */
-    public DataAera(Graphics2D g , int startX, int startY, int sizeX, int sizeY , Font titleFont , ClientJMX clientJMX) {
+    public DataAera(Graphics2D g , int startX, int startY, int sizeX, int sizeY , ClientJMX clientJMX) {
         this.g = g;
         Zone2X = startX;
         Zone2SizeX = sizeX;
         Zone2Y = startY;
         Zone2SizeY = sizeY;
         titleX = Zone2SizeX/2 - 30;
-        this.titleFont = titleFont;
         this.clientJMX = clientJMX;
     }
-    
+    /**
+     *  The first method, the graphic begin here.
+     */
     public void paint() {
         
         g.setPaint(colorBackground);
@@ -104,13 +106,18 @@ public class DataAera {
         drawText();
     }
     
+    /**
+     * write title on the data chart
+     */
     private void drawTitle() {
-        String title = "data center";
         g.setPaint(colorText);
         g.setFont(titleFont);
         g.drawString(title, Zone2X + titleX, Zone2Y + titleY);
     }
     
+    /**
+     * Display some informations on system and JVMs.
+     */
     private void drawText() {
         g.setFont(textFont);
         
