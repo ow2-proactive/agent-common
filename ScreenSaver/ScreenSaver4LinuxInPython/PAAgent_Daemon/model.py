@@ -50,46 +50,44 @@ import signal
 class Model:
     
     config_file = '/usr/bin/PAAgent/log.txt'
+    pid_file = '/usr/bin/PAAgent/pid.tmp'
     
     def launcher(self,command):
         user = commands.getoutput( 'whoami' )
         log = login.Login()
         if log.checkAccess(user):
-            if command == 'ScreenSaver':
-                print 'ss'
-                self.launchScreenSaver()
-                
             if command == 'startJVM':
                 print 'startJVM'
-                return self.startJVM(user)
+                self.startJVM(user)
                 
             if command == 'stopJVM':
                 print 'stopJVM'
-                return self.stopJVM(user)
+                self.stopJVM(user)
                 
         else:
-            print 'acces denied' 
+            print 'access denied' 
     
-    def launchScreenSaver(self):
-        command = 'gnome-screensaver-command --activate'
-        result = commands.getstatusoutput(command)
-        print result
         
     def startJVM(self,user):
+        #log part
         f = open( self.config_file ,'a')
         current_time = commands.getstatusoutput( 'date' )
         line = user + ' started JVM at : ' + str(current_time[1]) + '\n'
         f.write( line )
         f.close() 
+        
+        #launcher java part
         display = Xlib.display.Display()
         root = display.screen().root
         desktop = root.get_geometry()
         x = desktop.width
         y = desktop.height
-        cmd = "java -jar /usr/bin/PAAgent/FullScreenSaver.jar /tmp/ScreenSaver.png /tmp/ "
+        cmd = "java -jar /usr/bin/PAAgent/FullScreenSaver.jar /tmp/ScreenSaver.bmp /tmp/dataBase.rrd "
         cmd = cmd + str(x) + " " + str(y) 
-        #return Popen(cmd, shell=True).pid
-        return 0
+        pid = Popen(cmd, shell=True).pid
+        f = open(self.pid_file, 'w')
+        f.write(str(pid+1))
+        f.close()
     
     def stopJVM(self,user):
         f = open( self.config_file ,'a')
@@ -97,9 +95,16 @@ class Model:
         line = user + ' stopped JVM at : ' + str(current_time[1]) + '\n'
         f.write( line )
         f.close()   
-        #os.kill( self.jar_pid.pid, signal.SIGTERM)
+        if os.path.exists( self.pid_file ):
+            f = open(self.pid_file, 'r')
+            pid = f.read()
+            os.kill( int(pid), signal.SIGTERM)
+            #os.remove( self.pid_file )
         
-    def getPID(self , pid_jar):
-        print "pid : " + str(pid_jar)
+    def getPID(self):
+        if os.path.exists( self.pid_file ):
+            f = open(self.pid_file, 'r')
+            pid = f.read()
+            print "PID : " + pid
     
     

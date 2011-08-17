@@ -43,7 +43,7 @@ void itoa(int n, char s[])
  * Handler to detect end of screensaver ; catch SIGTERM
  */
 void handler(int signum){
-    printf("sigterm catched\n");
+    printf("signal %d catched\n" , signum);
     
     //Send "stopJVM" signal to the daemon
     system("python /usr/bin/PAAgent/client_daemon.py stopJVM");
@@ -53,16 +53,13 @@ void handler(int signum){
 
 int main() 
 { 
-        FILE *f;
-
-        if (f = fopen( "/tmp/ScreenSaver.png" ,"r")) {
-
-            remove("/tmp/ScreenSaver.png");
-        }
-
 	//Send "startJVM" signal to the daemon
         system("python /usr/bin/PAAgent/client_daemon.py startJVM");
 	signal( SIGTERM, handler );
+	signal( SIGKILL, handler );
+	signal( SIGQUIT, handler );
+        signal( SIGINT, handler );
+	signal( SIGSEGV, handler );
 	
 	/* Graphicals datas */
 	Display * display; 
@@ -97,33 +94,28 @@ int main()
 	image_width = DisplayWidth(display, screen_number);
 	image_height = DisplayHeight(display, screen_number);
 
-        char command[] = "java -jar /usr/bin/PAAgent/FullScreenSaver.jar /tmp/ScreenSaver.png /tmp/ ";
-        char space[] = " ";
-        char w[5] = "" , h[5] = ""  , tmp[10] = "" ;
-
-        itoa(image_width , w);
-        strcat(tmp , w);
-        strcat(tmp , space);
-        itoa(image_height , h);
-        strcat(tmp , h);
-        strcat(command , tmp);
-        printf(" sys : %d\n", system(command) );
+	int i;
 
         /* Read file */
-	int i,k;
-        char *fileName = "/tmp/ScreenSaver.png";
-	sImageHeader sImHead = readImage(fileName);
+	int k;
+        char *fileName = "/tmp/ScreenSaver.bmp";
+	sImageHeader* sImHead;
+
+	;
+	/* wait 1st picture to init data */
+	while( (sImHead = readImage(fileName)) == NULL ) {
+		sleep(1);
+	}
 	
 	/* The picture DATA */
-	unsigned long **image_data = (unsigned long **) malloc (sImHead.nRows * sizeof(unsigned long *) );
-	for(i=0 ; i < sImHead.nRows ; ++i) {
-		image_data[i] = (unsigned long *) malloc (sImHead.nCols * sizeof(unsigned long) );
+	unsigned long **image_data = (unsigned long **) malloc (sImHead->nRows * sizeof(unsigned long *) );
+	for(i=0 ; i < sImHead->nRows ; ++i) {
+		image_data[i] = (unsigned long *) malloc (sImHead->nCols * sizeof(unsigned long) );
 	}
+	
 	/* load BMP file */
-	loadMatric(fileName , image_data , sImHead.nCols , sImHead.nRows , 3 , sImHead.rasterOffset);
+	loadMatric(fileName , image_data , sImHead->nCols , sImHead->nRows , 3 , sImHead->rasterOffset);
 	/* ************* */
-
-        
 
 	/* Create simple window to receive picture */
 	win = XCreateSimpleWindow (display, 
@@ -143,8 +135,8 @@ int main()
 	pixmap = XCreatePixmap (display, root, image_width, image_height, depth); 
 	
 	/* draw on the pixmap */
-	for(k = 0 ; k < sImHead.nRows ; ++k) {
-		for (i = 0 ; i < sImHead.nCols ; ++i) {
+	for(k = 0 ; k < sImHead->nRows ; ++k) {
+		for (i = 0 ; i < sImHead->nCols ; ++i) {
 			XPutPixel( image , i , k , image_data[k][i]);
 		}
 	}
@@ -152,22 +144,22 @@ int main()
 	int posImageX = (DisplayWidth(display , 0) - image_width)/2;
 	int posImageY = (DisplayHeight(display , 0) - image_height)/2;
 
+	/* Wait Java application start monitoring */
+	sleep(2);
+
 	while(1)
 	{ 
 		// Display it on the screen
 		XPutImage (display, pixmap, gc, image, 0, 0, 0,0, image_width, image_height); 
 		XCopyArea (display, pixmap, win, gc, 0,0, image_width, image_height, posImageX , posImageY);
-		
-		printf(" sys : %d\n", system(command) );
-		//sleep(1);
-		
+
 		/* load BMP file */
-		loadMatric(fileName , image_data , sImHead.nCols , sImHead.nRows , 3 , sImHead.rasterOffset);
+		loadMatric(fileName , image_data , sImHead->nCols , sImHead->nRows , 3 , sImHead->rasterOffset);
 		/* ************* */
-		
+
 		/* draw on the pixmap */
-		for(k = 0 ; k < sImHead.nRows ; ++k) {
-			for (i = 0 ; i < sImHead.nCols ; ++i) {
+		for(k = 0 ; k < sImHead->nRows ; ++k) {
+			for (i = 0 ; i < sImHead->nCols ; ++i) {
 				XPutPixel( image , i , k , image_data[k][i]);
 			}
 		}
@@ -178,7 +170,7 @@ int main()
 	XDestroyImage (image); 
 	XCloseDisplay (display); 
 
-	for(i=0 ; i < sImHead.nRows ; ++i) {
+	for(i=0 ; i < sImHead->nRows ; ++i) {
 		free(image_data[i]);
 	}
 	free(image_data);

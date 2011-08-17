@@ -78,6 +78,10 @@ public class JVMDetector {
    private Map processes = null;
    private Map jmx = null;
    
+   public void resetPidTab() {
+       pidTab.clear();
+   }
+   
    /**
     * getter of the PID list.
     * @return a ArrayList of PID.
@@ -117,7 +121,7 @@ public class JVMDetector {
         // value
 	jmx = detectJMXAgent(processes.keySet());
 
-        setPIDList(processes, jmx);
+        setPIDList(jmx);
    }
    
    /**
@@ -126,14 +130,12 @@ public class JVMDetector {
     * @param processes The running JAVA process map.
     * @param jmx The jmx connectors map.
     */
-   private void setPIDList(Map processes, Map jmx){
+   private void setPIDList(Map jmx){
    	
    		for (Object object : jmx.entrySet().toArray()) {
    		
-	   		String[] tmp = object.toString().split("=");
-	   		String key = tmp[0];
-	   		
-	   		pidTab.add(key);
+                        int index = object.toString().indexOf("=");
+	   		pidTab.add(object.toString().substring(0, index));
 		}
    }
 

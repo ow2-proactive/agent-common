@@ -1,10 +1,12 @@
 #ifndef BMP_H_
 #define BMP_H_
 
-#include<stdio.h>
-#include<stdlib.h>
-#include<math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 #include <stdint.h>
+#include <sys/file.h>
+#include <unistd.h>
 
 /* Structures */
 typedef struct
@@ -37,7 +39,7 @@ typedef struct
 
 /* Functions */
 long getImageInfo(FILE*, long, int);
-sImageHeader readImage(char*);
+sImageHeader* readImage(char*);
 void loadMatric(char *, unsigned long ** , int , int , int , int );
 int getPaddingOfMatrix(int , int );
 

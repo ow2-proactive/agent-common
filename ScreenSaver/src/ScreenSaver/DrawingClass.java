@@ -67,8 +67,7 @@ public class DrawingClass{
     private int Error_X = 300;
     private int Error_Y = 300;
     
-    private ClientJMX clientJMX = new ClientJMX();
-    private boolean isJMXRunning = false;
+    private ClientJMX clientJMX;
     
     /* BackGround */
     private int Zone1X;
@@ -81,7 +80,6 @@ public class DrawingClass{
     private int Zone2Y;
     private int Zone2SizeY;
     
-    private String dataFile;
     private ChartAera chartAera;
     private DataAera dataAera;
     
@@ -91,6 +89,7 @@ public class DrawingClass{
     public DrawingClass(Graphics2D g, int sizeX , int sizeY , String dataFile) throws HeadlessException {
         
         this.g = g;
+        clientJMX = new ClientJMX(dataFile);
         
         GRAPHIC_LENGTH = sizeX;
         GRAPHIC_HEIGHT = sizeY; 
@@ -113,9 +112,8 @@ public class DrawingClass{
 
         /* Data Aera */
         dataAera = new DataAera(
-                g, Zone2X, Zone2Y, Zone2SizeX, Zone2SizeY , clientJMX );
+                g, Zone2X, Zone2Y, Zone2SizeX, Zone2SizeY);
         
-        this.dataFile = dataFile;
     }
     
     /**
@@ -125,8 +123,7 @@ public class DrawingClass{
         
         drawClock();
         
-        isJMXRunning = clientJMX.runJmx(dataFile);
-        if(isJMXRunning) {
+        if(clientJMX.runJmx()) {
            
             /* Chart Aera */
             chartAera.paint();
@@ -146,7 +143,7 @@ public class DrawingClass{
     private void drawClock() {
         g.setPaint( Color.white );
         Calendar cal = Calendar.getInstance();
-        g.drawString(cal.get(Calendar.HOUR_OF_DAY)+"h "+cal.get(Calendar.MINUTE)+"m et "+cal.get(Calendar.SECOND)+"s", 
-                Clock_X , Clock_Y);
+        String time = cal.get(Calendar.HOUR_OF_DAY)+"h "+cal.get(Calendar.MINUTE)+"m et "+cal.get(Calendar.SECOND)+"s";
+        g.drawString(time, Clock_X , Clock_Y);
     }
 }

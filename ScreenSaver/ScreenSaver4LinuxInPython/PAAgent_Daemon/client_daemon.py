@@ -61,8 +61,6 @@ if __name__ == "__main__":
                         daemon.stop()
                 elif 'restart' == sys.argv[1]:
                         daemon.restart()
-                elif 'screenSaver' == sys.argv[1]:
-                        daemon.launchScreenSaver()
                 elif 'startJVM' == sys.argv[1]:
                         daemon.startJVM()
                 elif 'getPID' == sys.argv[1]:

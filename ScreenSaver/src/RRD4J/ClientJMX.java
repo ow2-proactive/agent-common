@@ -38,7 +38,6 @@ package RRD4J;
 
 import com.sun.management.OperatingSystemMXBean;
 import java.awt.Color;
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -47,18 +46,13 @@ import java.lang.management.MemoryMXBean;
 import java.lang.management.RuntimeMXBean;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.Calendar;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.management.AttributeNotFoundException;
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanException;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
-import javax.management.ReflectionException;
 import javax.management.remote.JMXConnector;
 
 /**
@@ -67,24 +61,8 @@ import javax.management.remote.JMXConnector;
  */
 public class ClientJMX {
     
-    /**
-     * System and JVM informations.
-     */
-    private String operatingSystem;
-    private String hostName;
-    private long memHeap;
-    private long memNonHeap;
-    private String currentTask = "None";
-    private long totalMemory;
-    private long freeMemory;
-    private long totalSwap;
-    private long freeSwap;
-    private int nbJVM = 0;
+    private String dataBaseFile;
     
-    private String dataBaseFile = "database.rrd";
-    
-    // image on which we will draw the charts.
-    private BufferedImage img = null;
     // database manager
     private DataBase rrd4j = new DataBaseRrd4j();
     
@@ -92,25 +70,25 @@ public class ClientJMX {
      * Concatenate at end of JVMName for identical names.
      */
     private int debugName = 0;
-    private int nbJVMvoid = 0;
     
     // the JVMs detector and connector
     private JVMDetector JVMdetector = new JVMDetector();
     
     /**
-     * data structure to store memory informations.
-     */
-    private ArrayList<String> JVMNames = new ArrayList<String>();
-    private Color[] colorList = null;
-
-    /**
      * Default constructor. it initialize some colors for the charts.
      */
     public ClientJMX() {
+        
+    }
+
+    public ClientJMX(String dataFile) {
+        
+        dataBaseFile = dataFile;
+        
         /*
          * Initialisation of some colors.
          */
-        colorList = new Color[10];
+        Color[] colorList = new Color[10];
         
         colorList[0] = Color.BLACK;
         colorList[1] = Color.BLUE;
@@ -122,94 +100,8 @@ public class ClientJMX {
         colorList[7] = Color.RED;
         colorList[8] = Color.YELLOW;
         colorList[9] = Color.LIGHT_GRAY;
-    }
-    
-    /**
-     * return the JVM name focus by JMX.
-     * @return the JVMName object.
-     */
-    public ArrayList<String> getJVMNames() {
-        return JVMNames;
-    }
-    
-    /**
-     * return host name
-     * @return the host name object.
-     */
-    public String getHostName() {
-        return hostName;
-    }
-
-    /**
-     * return the current task type (mainly : Native or Java).
-     * @return the CurrentTask object.
-     */
-    public String getCurrentTask() {
-        return currentTask;
-    }
-
-    /**
-     * return the memory heap size in Mo.
-     * @return the MemHeap object.
-     */
-    public long getMemHeap() {
-        return memHeap;
-    }
-
-    /**
-     * return the non memory heap size in Mo.
-     * @return the MemNonHeap object.
-     */
-    public long getMemNonHeap() {
-        return memNonHeap;
-    }
-
-    /**
-     * return the operating system descriptor.
-     * @return OperatingSystem object.
-     */
-    public String getOperatingSystem() {
-        return operatingSystem;
-    }
-
-    /**
-     * return the free memory of system in Mo.
-     * @return the FreeMemory object.
-     */
-    public long getFreeMemory() {
-        return freeMemory;
-    }
-
-    /**
-     * return the physical memory of the system in Mo
-     * @return the TotalMemory object.
-     */
-    public long getTotalMemory() {
-        return totalMemory;
-    }
-
-    /**
-     * return the free swap of system in Mo.
-     * @return the FreeSwap object.
-     */
-    public long getFreeSwap() {
-        return freeSwap;
-    }
-
-    /**
-     * return the physical swap of the system in Mo
-     * @return the TotalMemory object.
-     */
-    public long getTotalSwap() {
-        return totalSwap;
-    }
-    
-    /**
-     * return the number of JVM
-     * @return the number of JVM.
-     */
-    public long getNbJVM() {
-        return nbJVM;
+        
+        Model.setColorList(colorList);
     }
     
     /**
@@ -225,11 +117,11 @@ public class ClientJMX {
      * @param input
      * @return 
      */
-    private boolean isLong( String input ) {
+    private boolean isLong( String str ) {
         
         try
         {
-            Long.parseLong(input);
+            Long.parseLong(str);
             return true;
         }
         catch( Exception e )
@@ -317,25 +209,19 @@ public class ClientJMX {
      * @param path The path of the database in the system.
      * @param JVMMemory memory information of each JVM.
      */
-    public void updateRrd4j(String path , double[] JVMMemory ) {
-        
-        if(!path.endsWith(System.getProperty("file.separator"))) {
-            path += System.getProperty("file.separator");
-        }
-        
-        String databasePath = path + dataBaseFile;
+    private void updateRrd4j() {
         
         /**
          * Set system values.
          */
-        Float RAM = (float)totalMemory;
-        RAM -= (float)freeMemory;
-        RAM /= (float)totalMemory;
+        Float RAM = (float)Model.getTotalMemory();
+        RAM -= (float)Model.getFreeMemory();
+        RAM /= (float)Model.getTotalMemory();
         RAM *= (float)100;
         
-        Float SWAP = (float)totalSwap;
-        SWAP -= (float)freeSwap;
-        SWAP /= (float)totalSwap;
+        Float SWAP = (float)Model.getTotalSwap();
+        SWAP -= (float)Model.getFreeSwap();
+        SWAP /= (float)Model.getTotalSwap();
         SWAP *= (float)100;
         
         String[] systemDb = new String[2];
@@ -349,177 +235,198 @@ public class ClientJMX {
         /**
          * Set JVM values.
          */
-        Random rand = new Random();
-        String[] JVMDb = new String[this.JVMNames.size()];
-        for (int i = 0; i < this.JVMNames.size() && i < 10 ; i++) {
-            JVMDb[i] = this.JVMNames.get(i);
+        String[] JVMDb = new String[Model.getJVMs().size()];
+        for (int i = 0; i < Model.getJVMs().size() && i < 10 ; i++) {
+            JVMDb[i] = Model.getJVMs().get(i).getName();
+        }
+        rrd4j.addValue(dataBaseFile, systemDb, systemValue , JVMDb , Model.getMemoryTab() , Model.getColorList());
+    }
+    
+    /**
+     * get system informations.
+     * @return true if all is good, false if not.
+     */
+    private boolean getSystemInformations() {
+        try {
+            /**
+                 * get Defaults informations on system.
+                 */
+                OperatingSystemMXBean mxbean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+                Model.setTotalMemory(mxbean.getTotalPhysicalMemorySize() / (1024*1024));
+                long mem = getMemoryUsed();
+                if (mem == 0) {
+                    return false;
+                }
+                Model.setFreeMemory(Model.getTotalMemory() - mem);
+                Model.setTotalSwap(mxbean.getTotalSwapSpaceSize() / (1024*1024));
+                Model.setFreeSwap(mxbean.getFreeSwapSpaceSize() / (1024*1024));
+                
+                Model.setOperatingSystem(System.getProperty("os.name") + " " + 
+                                        System.getProperty("os.arch") + " " + 
+                                        System.getProperty("os.version"));
+                Model.setHostName(InetAddress.getLocalHost().getHostName());
+                
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(ClientJMX.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("debug : getSystemInformations()");
         }
         
-        rrd4j.addValue(databasePath, systemDb, systemValue , JVMDb , JVMMemory , colorList);
+        return true;
+    }
+    
+    private boolean updateJVM(int index , JMXConnector conn , int PID , String name) {
+        
+        if(conn != null) {
+            try {
+                double memHeap, memNonHeap; 
+                
+                // Get an MBeanServerConnection
+                MBeanServerConnection mBeanServConn = conn.getMBeanServerConnection();
+
+                RuntimeMXBean mBeanRuntime = ManagementFactory.newPlatformMXBeanProxy(mBeanServConn,
+                                        ManagementFactory.RUNTIME_MXBEAN_NAME, RuntimeMXBean.class);
+
+                MemoryMXBean memBean = ManagementFactory.newPlatformMXBeanProxy(mBeanServConn, ManagementFactory.MEMORY_MXBEAN_NAME, MemoryMXBean.class ); 
+
+                Model.addToHeap( memBean.getHeapMemoryUsage().getUsed() );
+                Model.addToNonHeap( memBean.getNonHeapMemoryUsage().getUsed() );
+
+                /*
+                 * get back some information
+                 */
+                if(mBeanRuntime != null) {
+
+                    if(!name.equals("")){
+
+                        memHeap = memBean.getHeapMemoryUsage().getUsed();
+                        memHeap = (memHeap/Model.getTotalMemory()) * 100;
+                        memHeap /= 1024*1024;
+                        
+                        memNonHeap = memBean.getNonHeapMemoryUsage().getUsed();
+                        memNonHeap = (memNonHeap/Model.getTotalMemory()) * 100;
+                        memNonHeap /= 1024*1024;
+                        
+                        /*
+                         * Update JVMs ArrayList
+                         */
+                        Model.setJVM(index, new JVMData(name, PID, memHeap, memNonHeap, conn));
+                        
+                    } else {
+                        System.out.println("debug : updateJVM1");
+                    } 
+                }
+
+                /*
+                 * Check if there are any tasks in JVM.
+                 */
+                Set<ObjectName> names =
+                    new TreeSet<ObjectName>(mBeanServConn.queryNames(null, null));
+
+                /*
+                 * check for a task name.
+                 */
+                for (ObjectName oName : names) {
+                        if(name.toString().startsWith("org.objectweb.proactive.core.body")) {
+                                int i = mBeanServConn.getAttribute( oName, "Name").toString().lastIndexOf(".") + 1;
+                                Model.setCurrentTask((String)mBeanServConn.getAttribute( oName, "Name").toString().substring(index));
+                        }
+                }
+            } catch (Exception ex) {
+                System.out.println("debug : updateJVM2");
+            } 
+        }
+        return true;
+    }
+    
+    /**
+     * Test all connexions than we know.
+     * Update the running connexions and remove the broken.
+     */
+    private boolean checkJVMAtStart() {
+        
+        boolean checked = false;
+        
+        for (int index=0 ; index < Model.getJVMs().size() ; ++index) {
+            try {
+                JMXConnector conn = Model.getJVMs().get(index).getConnector();
+                if(conn.getConnectionId() != null ) {
+                    
+                    updateJVM(index, conn, Model.getJVMs().get(index).getPID() , Model.getJVMs().get(index).getName());
+                    checked = true;
+                } else {
+                    System.out.println("Broken connection detected for : " + Model.getJVMs().get(index).getName());
+                    Model.removeJVMByPID(Model.getJVMs().get(index).getPID());
+                }
+            } catch (IOException ex) {
+                System.out.println("Broken connection detected for : " + Model.getJVMs().get(index).getName());
+                Model.removeJVMByPID(Model.getJVMs().get(index).getPID());
+            }
+        }
+        
+        return checked;
+    }
+    
+    private void getTime(String str) {
+        
+        Calendar cal = Calendar.getInstance();
+        String time = cal.get(Calendar.HOUR_OF_DAY)+"h "+cal.get(Calendar.MINUTE)+"m et "+cal.get(Calendar.SECOND)+"s";
+        System.out.println(str + " : " + time);
     }
     
     /**
      * Run JMX listener
      * @return True if the listen has ran, False if not.
      */
-    public boolean runJmx(String dataFile) {
-        try {
-            /**
-             * Initialization.
-             */
-            long memHeapTmp = 0, memNonHeapTmp=0;
-            boolean check = false;
-            double[] JVMMemory = null;
-            int rank = 0;
-            
-            /**
-             * get Defaults informations on system.
-             */
-            OperatingSystemMXBean mxbean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-            this.totalMemory = mxbean.getTotalPhysicalMemorySize() / (1024*1024);
-            long mem = getMemoryUsed();
-            if (mem == 0) {
-                return false;
-            }
-            this.freeMemory = totalMemory - mem;
-            this.totalSwap = mxbean.getTotalSwapSpaceSize() / (1024*1024);
-            this.freeSwap = mxbean.getFreeSwapSpaceSize() / (1024*1024);
-            
-            this.operatingSystem =  System.getProperty("os.name") + " " + 
-                                    System.getProperty("os.arch") + " " + 
-                                    System.getProperty("os.version");
-            this.hostName = InetAddress.getLocalHost().getHostName();
-            
-            
-            /**
-             * Start JMX scanning.
-             */
-            JVMdetector.scan();
-            JVMMemory = new double[JVMdetector.getPidTab().size()];
-            try {
-                
-                for(int i = 0; i < JVMdetector.getPidTab().size() ; ++i) {
-                    
-                    JMXConnector jmxc = JVMdetector.getJMXConnector(JVMdetector.getPidTab().get(i));
-                    
-                    if(jmxc != null) {
-                        
-                        //We have seen at least one JVM.
-                        check = true;
-                        nbJVM++;
-                        
-                        // Get an MBeanServerConnection
-                        MBeanServerConnection mBeanServConn = jmxc.getMBeanServerConnection();
+    public boolean runJmx() {
+        
+        /*
+         * Initialization.
+         */
+        boolean check = false;
+        Model.resetMemory();
+        JVMdetector.resetPidTab();
 
-                        RuntimeMXBean mBeanRuntime = ManagementFactory.newPlatformMXBeanProxy(mBeanServConn,
-                                                ManagementFactory.RUNTIME_MXBEAN_NAME, RuntimeMXBean.class);
-                        
-                        MemoryMXBean memBean = ManagementFactory.newPlatformMXBeanProxy(mBeanServConn, ManagementFactory.MEMORY_MXBEAN_NAME, MemoryMXBean.class ); 
-
-                        memHeapTmp += memBean.getHeapMemoryUsage().getUsed();
-                        memNonHeapTmp += memBean.getNonHeapMemoryUsage().getUsed();
-                        
-                        /*
-                         * get back some information
-                         */
-                        if(mBeanRuntime != null) {
-                            //System.out.println("****************************");
-                            //System.out.println("name : " + parseName(JVMdetector.getProcesses().get( pid ).toString() ));
-                            
-                            String name = JVMdetector.getProcesses().get(JVMdetector.getPidTab().get(i) ).toString();
-                            
-                            if(!name.equals("")){
-                                
-                                if(this.JVMNames.contains(name)) {
-                                    name += (debugName++);
-                                }
-                                
-                                this.JVMNames.add( parseName( name ));
-                                
-                                JVMMemory[rank] = memBean.getHeapMemoryUsage().getUsed() + memBean.getNonHeapMemoryUsage().getUsed();
-                                JVMMemory[rank] = (JVMMemory[rank] / this.totalMemory) * 100;
-                                JVMMemory[rank] /= 1024*1024;
-                                
-                                rank++;
-                                //for (String arg : mBeanRuntime.getInputArguments()) {
-                                //    System.out.println("arg : " + arg);
-                                //}
-                            } else {
-                                JVMMemory = removeJVMofTab(JVMMemory, i);
-                                nbJVM--;
-                            } 
-                        }
-                        
-                        /*
-                         * Check if there are any tasks in JVM.
-                         */
-                        Set<ObjectName> names =
-                            new TreeSet<ObjectName>(mBeanServConn.queryNames(null, null));
-
-                        for (ObjectName name : names) {
-                                if(name.toString().startsWith("org.objectweb.proactive.core.body")) {
-                                        int index = mBeanServConn.getAttribute( name, "Name").toString().lastIndexOf(".") + 1;
-                                        currentTask = (String)mBeanServConn.getAttribute( name, "Name").toString().substring(index);
-                                }
-                        }
-                        jmxc.close();
-                    }
-                }
-                
-                this.memHeap = memHeapTmp / (1024*1024);
-                this.memNonHeap = memNonHeapTmp / (1024*1024);
-                
-                
-                /*
-                 * update RRD4J database
-                 */
-                updateRrd4j(dataFile , JVMMemory);
-                
-            } catch (MBeanException ex) {
-                Logger.getLogger(ClientJMX.class.getName()).log(Level.SEVERE, null, ex);
-                return false;
-            } catch (AttributeNotFoundException ex) {
-                Logger.getLogger(ClientJMX.class.getName()).log(Level.SEVERE, null, ex);
-                return false;
-            } catch (InstanceNotFoundException ex) {
-                Logger.getLogger(ClientJMX.class.getName()).log(Level.SEVERE, null, ex);
-                return false;
-            } catch (ReflectionException ex) {
-                Logger.getLogger(ClientJMX.class.getName()).log(Level.SEVERE, null, ex);
-                return false;
-            } catch (IOException ex) {
-                Logger.getLogger(ClientJMX.class.getName()).log(Level.SEVERE, null, ex);
-                return false;
-            } 
-            
-            return check;
-        } catch (UnknownHostException ex) {
-            Logger.getLogger(ClientJMX.class.getName()).log(Level.SEVERE, null, ex);
+        /**
+         * System informations
+         */
+        if(!getSystemInformations()) {
             return false;
         }
-    }
-    
-    /**
-     * Remove a specific element of an array.
-     * @param tab the array
-     * @param rank the id of the element to remove.
-     * @return the new array
-     */
-    private double[] removeJVMofTab(double[] tab, int rank) {
+
         
-        double[] tmp = new double[tab.length - 1];
-        int i = 0;
-        while(i < rank) {
-            tmp[i] = tab[i];
-            i++;
+        
+        /**
+         * Check JVm already connected.
+         */
+        check = checkJVMAtStart();
+        
+        
+        /**
+         * Start JMX scanning.
+         */
+        JVMdetector.scan();
+        for(int i = 0; i < JVMdetector.getPidTab().size() ; ++i) {
+            String pid = JVMdetector.getPidTab().get(i);
+            if(!Model.checkJVM( Integer.parseInt(pid) )) {
+                JMXConnector jmxc = JVMdetector.getJMXConnector(pid);
+
+                if(jmxc != null) {
+
+                    String name = JVMdetector.getProcesses().get(pid).toString();
+                    name = parseName(name);
+                    
+                    if(!name.equals("")) {
+                        updateJVM(Model.addJVM(), jmxc, Integer.parseInt(pid) , name);
+                        check = true;
+                    }
+                }
+            }
         }
-        i++;
-        while(i<tab.length) {
-            tmp[i-1] = tab[i];
-            i++;
-        }
-        tab = tmp;
-        return tab;
+        Model.setMemHeap( Model.getMemHeap() / (1024*1024));
+        Model.setMemNonHeap( Model.getMemNonHeap() / (1024*1024));
+        updateRrd4j();
+
+        return check;
     }
     
     public static void main(String[] args) {
@@ -542,5 +449,8 @@ public class ClientJMX {
         } catch (IOException ex) {
             Logger.getLogger(ClientJMX.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        
+        
     }
 }

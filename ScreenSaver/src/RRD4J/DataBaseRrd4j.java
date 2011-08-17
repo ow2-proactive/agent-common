@@ -217,8 +217,6 @@ public class DataBaseRrd4j implements DataBase {
                     rrdDef.setStep(1);
                     rrdDef.addArchive(ConsolFun.TOTAL, 0.2, 1, 5000);
                     
-                    
-                    
                     for(int i = 0 ; i < dbNameSystem.length ; ++i) {
                         systemDataSource.add( new ChartData(dbNameSystem[i], color[i]));
                         rrdDef.addDatasource(dbNameSystem[i], DsType.GAUGE, 5000, Double.NaN, Double.NaN);
@@ -257,70 +255,80 @@ public class DataBaseRrd4j implements DataBase {
      * @return true if all is good, false if not.
      */
     public boolean addValue(String path, String[] dbSystem, double[] valueSystem, String[] dbJVMs, double[] valueJVMs, Color[] colors) {
-        RrdDb rrdDb = null;
-        
-        
-        if(!new File(path).exists()) {
-            createDB( path, dbSystem , dbJVMs , colors);
-        } 
-        
         try {
-            rrdDb = new RrdDb(path);
-            RrdDef rrdDef = rrdDb.getRrdDef();
+            RrdDb rrdDb = null;
             
-            for (String name : dbSystem) {
-                if(!rrdDb.containsDs(name)){
-                    rrdDef.addDatasource(name, DsType.GAUGE, 5000, Double.NaN, Double.NaN);
-                }
-            }
-            for (String name : dbJVMs) {
-                if(!rrdDb.containsDs(name)){
-                    rrdDef.addDatasource(name, DsType.GAUGE, 5000, Double.NaN, Double.NaN);
-                }
-            }
             
-            this.path = path;
+            if(!new File(path).exists()) {
+                createDB( path, dbSystem , dbJVMs , colors);
+            } 
+            
+            try {
+                rrdDb = new RrdDb(path);
+                RrdDef rrdDef = rrdDb.getRrdDef();
+                
+                for (String name : dbSystem) {
+                    if(!rrdDb.containsDs(name)){
+                        rrdDef.addDatasource(name, DsType.GAUGE, 5000, Double.NaN, Double.NaN);
+                    }
+                }
+                for (String name : dbJVMs) {
+                    if(!rrdDb.containsDs(name)){
+                        rrdDef.addDatasource(name, DsType.GAUGE, 5000, Double.NaN, Double.NaN);
+                    }
+                }
+                
+                this.path = path;
 
-            for (int i = 0; i < dbSystem.length; i++) {
-                if(!dataSourceSystemExist(dbSystem[i])) {
-                    systemDataSource.add(new ChartData(dbSystem[i], colors[i]));
+                for (int i = 0; i < dbSystem.length; i++) {
+                    if(!dataSourceSystemExist(dbSystem[i])) {
+                        systemDataSource.add(new ChartData(dbSystem[i], colors[i]));
+                    }
                 }
-            }
-            for (int i = 0; i < dbJVMs.length; i++) {
-                if(!dataSourceJVMExist(dbJVMs[i])) {
-                    JVMDataSource.add(new ChartData(dbJVMs[i], colors[i+dbSystem.length]));
+                for (int i = 0; i < dbJVMs.length; i++) {
+                    if(!dataSourceJVMExist(dbJVMs[i])) {
+                        JVMDataSource.add(new ChartData(dbJVMs[i], colors[i+dbSystem.length]));
+                    }
                 }
+                
+            } catch (IOException ex) {
+                Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
+                return false;
             }
             
-        } catch (IOException ex) {
+            try {
+                
+                Sample sample = rrdDb.createSample();
+                
+                long time = getTime();
+                String val = time + "";
+                
+                for (double d : valueSystem) {
+                    val += ":" + d;
+                }
+                for (double d : valueJVMs) {
+                    val += ":" + d;
+                }
+                
+                sample.setAndUpdate(val);
+                
+                endTime = time;
+                rrdDb.close();
+                
+            } catch (IOException ex) {
+                Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
+                return false;
+            }
+            
+            // To avoid bug with future stored values (1 second minimum between each value).
+            Thread.sleep(1000);
+            
+            
+        } catch (InterruptedException ex) {
             Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
         
-        try {
-            
-            Sample sample = rrdDb.createSample();
-            
-            long time = getTime();
-            String val = time + "";
-            
-            for (double d : valueSystem) {
-                val += ":" + d;
-            }
-            for (double d : valueJVMs) {
-                val += ":" + d;
-            }
-            
-            
-            sample.setAndUpdate(val);
-            
-            endTime = time;
-            rrdDb.close();
-            
-        } catch (IOException ex) {
-            Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        }
         return true;
     }
 
@@ -333,9 +341,7 @@ public class DataBaseRrd4j implements DataBase {
      */
     public BufferedImage createGraphic(int type , String title) {
         try{
-            if(startTime==0L) {
                 startTime = endTime - currentDuration;
-            }
             
             RrdGraphDef graphDef = new RrdGraphDef();
             graphDef.setTimeSpan(startTime, endTime);
@@ -347,25 +353,29 @@ public class DataBaseRrd4j implements DataBase {
                 for(int i = 0 ; i < systemDataSource.size() ; ++i) {
                     graphDef.datasource(
                             systemDataSource.get(i).getDataSourceName(), this.path, 
-                            systemDataSource.get(i).getDataSourceName() , ConsolFun.TOTAL); 
+                            systemDataSource.get(i).getDataSourceName(), ConsolFun.TOTAL); 
                     graphDef.line(
                             systemDataSource.get(i).getDataSourceName(), systemDataSource.get(i).getColor() , 
                             systemDataSource.get(i).getDataSourceName(), 1);
                 }
+                
+                graphDef.setMaxValue(100);
+                
             } else {
                for(int i = 0 ; i < JVMDataSource.size() ; ++i) {
                     graphDef.datasource(
                             JVMDataSource.get(i).getDataSourceName(), this.path, 
-                            JVMDataSource.get(i).getDataSourceName() , ConsolFun.TOTAL); 
+                            JVMDataSource.get(i).getDataSourceName(), ConsolFun.TOTAL); 
                     graphDef.line(
                             JVMDataSource.get(i).getDataSourceName(), JVMDataSource.get(i).getColor() , 
                             i + "", 1);
                 } 
+                graphDef.setAltAutoscaleMax(true);
             }
 
             graphDef.setFilename(graphPath);
             graphDef.setTitle(title);
-            graphDef.setMaxValue(100);
+            
             graphDef.setMinValue(0);
             graphDef.setVerticalLabel("percent %");
             graphDef.setAltYGrid(true);

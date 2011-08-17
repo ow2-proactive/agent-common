@@ -44,6 +44,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Calendar;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -55,6 +56,8 @@ import javax.swing.ImageIcon;
 
 public class ScreenSaver {
     
+    private static URL imageURL = ScreenSaver.class.getResource("ActiveEon.png");
+    private static ImageIcon icon = new ImageIcon(imageURL);
     /**
      * Initialize the Graphics2D object with background,resources and copyright.
      * 
@@ -64,12 +67,6 @@ public class ScreenSaver {
      * @return The Graphics2D initialize.
      */
     public static Graphics2D init(Graphics2D g , int x , int y) {
-        
-        URL imageURL = ScreenSaver.class.getResource("ActiveEon.png");
-        ImageIcon icon = null;
-        if( imageURL != null) {
-            icon = new ImageIcon(imageURL);
-        }
         
         g.setPaint( Color.BLACK );
         g.drawRect(0, 0, x, y);
@@ -105,26 +102,42 @@ public class ScreenSaver {
         
         System.out.println("Starting screensaver..");
         
+        if( imageURL != null) {
+            icon = new ImageIcon(imageURL);
+        }
+        
         BufferedImage bitmap = new BufferedImage(x, y, BufferedImage.TYPE_3BYTE_BGR);
         Graphics2D g = bitmap.createGraphics();
-        g = init(g, x, y);
         
         DrawingClass draw = new DrawingClass(g,bitmap.getWidth(),bitmap.getHeight() , dataFile);
-        draw.paint();
-
-        g.dispose();
-
-        try {
-                ImageIO.write(bitmap, "bmp", new File( pictureFile ));
-        } catch (IOException e) {
+        
+        new File(dataFile).delete();
+        new File(pictureFile).delete();
+        
+        
+        /*
+         * Drawing loop
+         */
+        while(true) {
+            g.clearRect(0, 0, x, y);
+            g = init(g, x, y);
+            draw.paint();
+            try {
+                ImageIO.write(bitmap, "BMP", new File( pictureFile ));
+                
+                Calendar cal = Calendar.getInstance();
+                String time = cal.get(Calendar.HOUR_OF_DAY)+"h "+cal.get(Calendar.MINUTE)+"m et "+cal.get(Calendar.SECOND)+"s";
+                System.out.println("file created at : " + time );
+            } catch (IOException e) {
+                System.out.println("bug during creating picture.");
+            }
+            
         }
-
+        
     } 
     
     public static void main( String[] argv ) {
             
-        //System.out.println("java home : " + System.getProperty("java.home"));
-        
         String imgFile;
         String dataFile;
         int x,y;

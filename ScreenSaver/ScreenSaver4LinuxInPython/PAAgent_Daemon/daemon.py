@@ -53,8 +53,6 @@ from model import Model
 # This daemon is ab
 class Daemon:
         
-        pid_jar = 0
-        
         def __init__(self, pidfile, stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
                 self.stdin = stdin
                 self.stdout = stdout
@@ -170,18 +168,14 @@ class Daemon:
                 self.stop()
                 self.start()
   
-        def launchScreenSaver(self):
-            Model().launcher('ScreenSaver')
-                
         def startJVM(self):
-            self.pid_jar = Model().launcher('startJVM')
-            print "pid : " + str(self.pid_jar)
+            Model().launcher('startJVM')
             
         def stopJVM(self):
             Model().launcher('stopJVM')
             
         def getPID(self):
-            Model().getPID(self.pid_jar)
+            Model().getPID()
  
         def run(self):
                 """
