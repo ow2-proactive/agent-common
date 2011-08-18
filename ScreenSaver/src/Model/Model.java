@@ -1,16 +1,48 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * ################################################################
+ *
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
+ *
+ * Copyright (C) 1997-2011 INRIA/University of
+ *                 Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ *
+ *  Initial developer(s):               The ActiveEon Team
+ *                        http://www.activeeon.com/
+ *  Contributor(s):
+ *
+ * ################################################################ 
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package RRD4J;
+package Model;
 
-import java.awt.Color;
+import RRD4J.JVMData;
 import java.util.ArrayList;
 import javax.management.remote.JMXConnector;
 
 /**
  *
- * @author pgouttef
+ * @author philippe Gouttefarde
  */
 public class Model {
     
@@ -31,9 +63,17 @@ public class Model {
      * data structure to store memory informations.
      */
     private static ArrayList<JVMData> JVMs = new ArrayList<JVMData>();
-    private static Color[] colorList = null;
 
-    static double[] getMemoryTab() {
+    /**
+     * Concatenate at end of JVMName for identical names.
+     */
+    private int debugName = 0;
+    
+    /**
+     * return the total memory of each JVM in a tab for the rrd4j database.
+     * @return the total memory of each JVM in a tab for the rrd4j database.
+     */
+    static public double[] getMemoryTab() {
         double[] mem = new double[ JVMs.size() ];
         for (int i = 0; i < mem.length ; ++i) {
             mem[i] = JVMs.get(i).getTotalMemory();
@@ -41,20 +81,24 @@ public class Model {
         
         return mem;
     }
-    
-    /**
-     * Concatenate at end of JVMName for identical names.
-     */
-    private int debugName = 0;
 
+    /**
+     * return a JVM list.
+     * @return a JVM list.
+     */
     public static ArrayList<JVMData> getJVMs() {
         return JVMs;
     }
 
-    public static void setJVMs(ArrayList<JVMData> JVMs) {
-        Model.JVMs = JVMs;
-    }
-
+    /**
+     * add a new JVM in the list. The method check the PID.
+     * @param name the JVM name.
+     * @param PID the JVM PID.
+     * @param memHeap the JVM memory heap.
+     * @param memNonHeap the JVM memory non heap.
+     * @param conn the JMX connector of the JVM.
+     * @return true if the JVM has been add, false if not.
+     */
     public static boolean addJVM(String name, int PID, double memHeap, double memNonHeap, JMXConnector conn) {
         
         if(Model.checkJVM(PID)) {
@@ -67,12 +111,22 @@ public class Model {
         return true;
     }
     
+    /**
+     * JVM setter
+     * @param index the JVM index in the arraylist.
+     * @param data the JVM.
+     */
     public static void setJVM(int index, JVMData data) {
         if(index < JVMs.size()) {
             JVMs.set(index, data);
         }
     }
     
+    /**
+     * check the PID existing in the array list.
+     * @param PID the PID to check.
+     * @return true if it has been found, false if not.
+     */
     public static boolean checkJVM(int PID) {
         
         for(int i = 0; i < JVMs.size() ; ++i) {
@@ -83,6 +137,10 @@ public class Model {
         return false;
     }
     
+    /**
+     * Remove a specific JVM corresponding at he PID.
+     * @param PID the JVM PID.
+     */
     public static void removeJVMByPID(int PID) {
         
         for(int i = 0; i < JVMs.size() ; ++i) {
@@ -92,12 +150,19 @@ public class Model {
         }
     }
     
+    /**
+     * create a new JVM a end of list, and return the new rank.
+     * @return the new JVM rank.
+     */
     public static int addJVM() {
         
         JVMs.add( new JVMData() );
         return (JVMs.size() - 1);
     }
     
+    /**
+     * debug method to display current JVMs.
+     */
     public static void displayJVmNames() {
         System.out.println("nb JVM : " + JVMs.size());
         for (JVMData data : JVMs) {
@@ -105,25 +170,29 @@ public class Model {
         }
     }
     
+    /**
+     * add value to current memory heap size.
+     * @param mem the new value to add.
+     */
     public static void addToHeap(long mem) {
         memHeap += mem;
     }
     
+    /**
+     * add value to current memory non heap size.
+     * @param mem the new value to add.
+     */
     public static void addToNonHeap(long mem) {
         memNonHeap += mem;
     }
     
+    /**
+     * reset memory Heap and non Heap to zero.
+     * It's done before every scan.
+     */
     public static void resetMemory() {
         memHeap = 0;
         memNonHeap = 0;
-    }
-    
-    public static Color[] getColorList() {
-        return colorList;
-    }
-
-    public static void setColorList(Color[] colorList) {
-        Model.colorList = colorList;
     }
 
     /**
@@ -134,6 +203,10 @@ public class Model {
         return currentTask;
     }
 
+    /**
+     * set the current task.
+     * @param currentTask the current task name.
+     */
     public static void setCurrentTask(String currentTask) {
         Model.currentTask = currentTask;
     }
@@ -146,6 +219,10 @@ public class Model {
         return freeMemory;
     }
 
+    /**
+     * free memory setter.
+     * @param freeMemory the value to set.
+     */
     public static void setFreeMemory(long freeMemory) {
         Model.freeMemory = freeMemory;
     }
@@ -158,6 +235,10 @@ public class Model {
         return freeSwap;
     }
 
+    /**
+     * free SWAP setter.
+     * @param freeSwap the value to set.
+     */
     public static void setFreeSwap(long freeSwap) {
         Model.freeSwap = freeSwap;
     }
@@ -170,6 +251,10 @@ public class Model {
         return hostName;
     }
 
+    /**
+     * host name setter.
+     * @param hostName the value to set.
+     */
     public static void setHostName(String hostName) {
         Model.hostName = hostName;
     }
@@ -182,6 +267,10 @@ public class Model {
         return memHeap;
     }
 
+    /**
+     * memory heap setter.
+     * @param memHeap the value to set.
+     */
     public static void setMemHeap(long memHeap) {
         Model.memHeap = memHeap;
     }
@@ -194,6 +283,10 @@ public class Model {
         return memNonHeap;
     }
 
+    /**
+     * memory non heap to set.
+     * @param memNonHeap the value to set.
+     */
     public static void setMemNonHeap(long memNonHeap) {
         Model.memNonHeap = memNonHeap;
     }
@@ -206,6 +299,10 @@ public class Model {
         return operatingSystem;
     }
 
+    /**
+     * operating system setter.
+     * @param operatingSystem the value to set.
+     */
     public static void setOperatingSystem(String operatingSystem) {
         Model.operatingSystem = operatingSystem;
     }
@@ -218,6 +315,11 @@ public class Model {
         return totalMemory;
     }
 
+    
+    /**
+     * total memory setter.
+     * @param totalMemory the value to set.
+     */
     public static void setTotalMemory(long totalMemory) {
         Model.totalMemory = totalMemory;
     }
@@ -230,6 +332,10 @@ public class Model {
         return totalSwap;
     }
 
+    /**
+     * total SWAP setter.
+     * @param totalSwap the value to set.
+     */
     public static void setTotalSwap(long totalSwap) {
         Model.totalSwap = totalSwap;
     }

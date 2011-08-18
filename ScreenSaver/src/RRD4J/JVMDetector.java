@@ -78,6 +78,10 @@ public class JVMDetector {
    private Map processes = null;
    private Map jmx = null;
    
+   public JVMDetector() {
+       initPath();
+   }
+   
    public void resetPidTab() {
        pidTab.clear();
    }
@@ -90,10 +94,17 @@ public class JVMDetector {
 	   return pidTab;
    }
 
+   /**
+    * return the process map
+    * @return the process map
+    */
     public Map getProcesses() {
             return processes;
     }
 
+    /**
+     * Init the JAVAHOME path
+     */
     private void initPath() {
             path = System.getProperty("java.home");
             path += sep + ".." + sep + "bin" + sep;
@@ -104,7 +115,6 @@ public class JVMDetector {
      */
    public void scan() {
 	   	
-        initPath();
         // first round: get all process info.
         // process id is the key, name of the process is the value
         // name includes full package name for the application's main class
@@ -127,7 +137,6 @@ public class JVMDetector {
    /**
     * set the PID list.
     * 
-    * @param processes The running JAVA process map.
     * @param jmx The jmx connectors map.
     */
    private void setPIDList(Map jmx){

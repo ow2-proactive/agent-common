@@ -153,6 +153,8 @@ int main()
 		XPutImage (display, pixmap, gc, image, 0, 0, 0,0, image_width, image_height); 
 		XCopyArea (display, pixmap, win, gc, 0,0, image_width, image_height, posImageX , posImageY);
 
+		sleep(1);
+
 		/* load BMP file */
 		loadMatric(fileName , image_data , sImHead->nCols , sImHead->nRows , 3 , sImHead->rasterOffset);
 		/* ************* */

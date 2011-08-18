@@ -56,6 +56,7 @@ import javax.swing.ImageIcon;
 
 public class ScreenSaver {
     
+    //ProActive picture resource
     private static URL imageURL = ScreenSaver.class.getResource("ActiveEon.png");
     private static ImageIcon icon = new ImageIcon(imageURL);
     /**
@@ -64,12 +65,12 @@ public class ScreenSaver {
      * @param g the graphics2D object.
      * @param x width of the picture.
      * @param y height of the picture.
-     * @return The Graphics2D initialize.
+     * @return The Graphics2D initialized.
      */
     public static Graphics2D init(Graphics2D g , int x , int y) {
         
         g.setPaint( Color.BLACK );
-        g.drawRect(0, 0, x, y);
+        g.clearRect(0, 0, x, y);
         
         g.drawImage(icon.getImage(), 30, 30, null);
         
@@ -102,54 +103,56 @@ public class ScreenSaver {
         
         System.out.println("Starting screensaver..");
         
-        if( imageURL != null) {
-            icon = new ImageIcon(imageURL);
-        }
-        
-        BufferedImage bitmap = new BufferedImage(x, y, BufferedImage.TYPE_3BYTE_BGR);
-        Graphics2D g = bitmap.createGraphics();
-        
-        DrawingClass draw = new DrawingClass(g,bitmap.getWidth(),bitmap.getHeight() , dataFile);
-        
-        new File(dataFile).delete();
-        new File(pictureFile).delete();
-        
-        
-        /*
-         * Drawing loop
-         */
-        while(true) {
-            g.clearRect(0, 0, x, y);
-            g = init(g, x, y);
-            draw.paint();
-            try {
-                ImageIO.write(bitmap, "BMP", new File( pictureFile ));
-                
-                Calendar cal = Calendar.getInstance();
-                String time = cal.get(Calendar.HOUR_OF_DAY)+"h "+cal.get(Calendar.MINUTE)+"m et "+cal.get(Calendar.SECOND)+"s";
-                System.out.println("file created at : " + time );
-            } catch (IOException e) {
-                System.out.println("bug during creating picture.");
-            }
+        if(x > 0 && y > 0) {
+            BufferedImage bitmap = new BufferedImage(x, y, BufferedImage.TYPE_3BYTE_BGR);
+            Graphics2D template = bitmap.createGraphics();
+            Graphics2D g = bitmap.createGraphics();
             
+            DrawingClass draw = new DrawingClass(bitmap.getWidth(),bitmap.getHeight() , dataFile);
+
+            
+            new File(dataFile).delete();
+            new File(pictureFile).delete();
+
+            template = init(template,x,y);
+            /*
+             * Drawing loop
+             */
+            while(true) {
+                // The draw method
+                g = (Graphics2D) template.create(0, 0, x, y);
+                draw.paint(  g  );
+                try {
+                    ImageIO.write(bitmap, "BMP", new File( pictureFile ));
+
+                    Calendar cal = Calendar.getInstance();
+                    String time = cal.get(Calendar.HOUR_OF_DAY)+"h "+cal.get(Calendar.MINUTE)+"m et "+cal.get(Calendar.SECOND)+"s";
+                    System.out.println("file created at : " + time );
+                } catch (IOException e) {
+                    System.out.println("bug during creating picture.");
+                }
+
+            }
+        } else {
+            System.out.println("Coordonate X and Y have to be positive.");
+            System.out.println("Found X: " + x + " and Y: " + y);
+            System.err.println("Exit...");
         }
-        
     } 
     
     public static void main( String[] argv ) {
             
-        String imgFile;
-        String dataFile;
-        int x,y;
         if(argv.length == 4) {
 
-            imgFile = argv[0];
-            dataFile = argv[1];
-            x = Integer.parseInt(argv[2]);
-            y = Integer.parseInt(argv[3]);
-
-            ScreenSaver.createBMP( imgFile , dataFile , x , y );
-
+            ScreenSaver.createBMP( 
+                    // BMP file path
+                    argv[0] , 
+                    // rrd4j file path
+                    argv[1] , 
+                    // X size of screen
+                    Integer.parseInt(argv[2]) ,
+                    // Y size of screen
+                    Integer.parseInt(argv[3]) );
         }
     }
 }

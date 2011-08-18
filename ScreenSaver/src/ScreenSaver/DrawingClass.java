@@ -39,7 +39,6 @@ package ScreenSaver;
 import RRD4J.ClientJMX;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.HeadlessException;
 import java.util.Calendar;
 
 /**
@@ -51,7 +50,6 @@ public class DrawingClass{
     /*
      * The chart. Display the events list on the screen. All coordonate are generated dynamically.
      */
-    private Graphics2D g;
     
     private int GRAPHIC_LENGTH = 800;
     private int GRAPHIC_HEIGHT = 600; 
@@ -83,12 +81,14 @@ public class DrawingClass{
     private ChartAera chartAera;
     private DataAera dataAera;
     
-    /*
-     * Constructor
+    /**
+     * 
+     * @param sizeX X size of screen
+     * @param sizeY Y size of screen
+     * @param dataFile rrd4j file path
      */
-    public DrawingClass(Graphics2D g, int sizeX , int sizeY , String dataFile) throws HeadlessException {
+    public DrawingClass(int sizeX , int sizeY , String dataFile) {
         
-        this.g = g;
         clientJMX = new ClientJMX(dataFile);
         
         GRAPHIC_LENGTH = sizeX;
@@ -104,32 +104,33 @@ public class DrawingClass{
         Zone2X = BORDER_L_R;
         Zone2SizeX = -(Zone1SizeX - GRAPHIC_LENGTH) - 2 * BORDER_L_R;
         Zone2Y = PAD_TOP;
-        Zone2SizeY = GRAPHIC_HEIGHT - PAD_TOP - PAD_BOTTOM;
+        Zone2SizeY = Zone1SizeY;
         
         /* Chart Aera */
         chartAera = new ChartAera(
-                g, Zone1X, Zone1Y, Zone1SizeX, Zone1SizeY , clientJMX);
+                Zone1X, Zone1Y, Zone1SizeX, Zone1SizeY , clientJMX);
 
         /* Data Aera */
         dataAera = new DataAera(
-                g, Zone2X, Zone2Y, Zone2SizeX, Zone2SizeY);
+                Zone2X, Zone2Y, Zone2SizeX, Zone2SizeY);
         
     }
     
     /**
-     *  The first method, the graphic begin here.
+     * The first method, the graphic begin here.
+     * @param g the Graphics2D support to paint
      */
-    public void paint() {
+    public void paint(Graphics2D g) {
         
-        drawClock();
+        drawClock(g);
         
         if(clientJMX.runJmx()) {
            
             /* Chart Aera */
-            chartAera.paint();
+            chartAera.paint(g);
 
             /* Data Aera */
-            dataAera.paint();
+            dataAera.paint(g);
         
         } else {
             g.drawString("No signal on JMX port...", 
@@ -139,9 +140,12 @@ public class DrawingClass{
     
     /**
      * Display current time on the screensaver.
+     * @param g the Graphics2D support to paint
      */
-    private void drawClock() {
-        g.setPaint( Color.white );
+    private void drawClock(Graphics2D g) {
+        g.setPaint(Color.BLACK);
+        g.clearRect(Clock_X, Clock_Y-12, 100 , 15);
+        g.setPaint( Color.WHITE );
         Calendar cal = Calendar.getInstance();
         String time = cal.get(Calendar.HOUR_OF_DAY)+"h "+cal.get(Calendar.MINUTE)+"m et "+cal.get(Calendar.SECOND)+"s";
         g.drawString(time, Clock_X , Clock_Y);

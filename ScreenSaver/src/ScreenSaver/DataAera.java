@@ -36,7 +36,7 @@
  */
 package ScreenSaver;
 
-import RRD4J.Model;
+import Model.Model;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -46,8 +46,6 @@ import java.awt.Graphics2D;
  * @author philippe Gouttefarde
  */
 public class DataAera {
-    
-    private Graphics2D g;
     
     //Graphical informations
     private int Zone2X;
@@ -73,16 +71,12 @@ public class DataAera {
     
     /**
      * Constructor with parameters.
-     * @param g : graphics2D objecton which we will draw.
      * @param startX : X start coordonate of data aera on graphics2D.
      * @param startY : Y start coordonate of data aera on graphics2D.
      * @param sizeX : X size of data aera on graphics2D.
-     * @param sizeY
-     * @param titleFont
-     * @param clientJMX 
+     * @param sizeY : Y size of data aera on graphics2D.
      */
-    public DataAera(Graphics2D g , int startX, int startY, int sizeX, int sizeY) {
-        this.g = g;
+    public DataAera(int startX, int startY, int sizeX, int sizeY) {
         Zone2X = startX;
         Zone2SizeX = sizeX;
         Zone2Y = startY;
@@ -92,19 +86,20 @@ public class DataAera {
     /**
      *  The first method, the graphic begin here.
      */
-    public void paint() {
+    public void paint(Graphics2D g) {
         
         g.setPaint(colorBackground);
         g.fillRect(Zone2X, Zone2Y, Zone2SizeX,Zone2SizeY);
         
-        drawTitle();
-        drawText();
+        drawTitle(g);
+        drawText(g);
     }
     
     /**
      * write title on the data chart
+     * @param g the Graphics2D support to paint
      */
-    private void drawTitle() {
+    private void drawTitle(Graphics2D g) {
         g.setPaint(colorText);
         g.setFont(titleFont);
         g.drawString(title, Zone2X + titleX, Zone2Y + titleY);
@@ -112,8 +107,9 @@ public class DataAera {
     
     /**
      * Display some informations on system and JVMs.
+     * @param g the Graphics2D support to paint
      */
-    private void drawText() {
+    private void drawText(Graphics2D g) {
         g.setFont(textFont);
         
         g.drawString("Operating System : " + Model.getOperatingSystem(), Zone2X + startTextX, Zone2Y + 2*startTextY);
@@ -133,9 +129,5 @@ public class DataAera {
         for(int i=0 ; i < Model.getJVMs().size() ; ++i) {
             g.drawString(i + ") " + Model.getJVMs().get(i).getName(), Zone2X + startTextX +10, Zone2Y + startTextY + (16+i)*sizeLine);
         }
-        
-        
-        
-        
     }
 }

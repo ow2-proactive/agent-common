@@ -36,8 +36,8 @@
  */
 package RRD4J;
 
+import Model.Model;
 import com.sun.management.OperatingSystemMXBean;
-import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -75,33 +75,12 @@ public class ClientJMX {
     private JVMDetector JVMdetector = new JVMDetector();
     
     /**
-     * Default constructor. it initialize some colors for the charts.
+     * parameter constructor
+     * @param dataFile the rrd4j file path
      */
-    public ClientJMX() {
-        
-    }
-
     public ClientJMX(String dataFile) {
         
         dataBaseFile = dataFile;
-        
-        /*
-         * Initialisation of some colors.
-         */
-        Color[] colorList = new Color[10];
-        
-        colorList[0] = Color.BLACK;
-        colorList[1] = Color.BLUE;
-        colorList[2] = Color.CYAN;
-        colorList[3] = Color.DARK_GRAY;
-        colorList[4] = Color.GREEN;
-        colorList[5] = Color.MAGENTA;
-        colorList[6] = Color.ORANGE;
-        colorList[7] = Color.RED;
-        colorList[8] = Color.YELLOW;
-        colorList[9] = Color.LIGHT_GRAY;
-        
-        Model.setColorList(colorList);
     }
     
     /**
@@ -113,9 +92,9 @@ public class ClientJMX {
     }
     
     /**
-     * Test if parameter is a Long or Not
-     * @param input
-     * @return 
+     * Test if parameter is a Long or Not.
+     * @param str a String.
+     * @return true is the string is a number, false if not.
      */
     private boolean isLong( String str ) {
         
@@ -162,7 +141,7 @@ public class ClientJMX {
     
     /**
      * debug method to display a String tab
-     * @param tab 
+     * @param tab the tab to display
      */
     private void displayTab(String[] tab) {
         System.out.println("\ntab : ");
@@ -172,13 +151,14 @@ public class ClientJMX {
     }
     
     /**
-     * This method parses the complete name of a JVM and return the executable name 
-     * (it removes the path and optional parameters)
-     * @param name
-     * @return 
+     * This method parses the complete name of a JVM and return the executable name .
+     * (it removes the path and optional parameters).
+     * @param name the origin name to parse.
+     * @return the final name.
      */
     private String parseName(String name) {
-        
+
+        String value;
         String[] n = name.split(" ");
         if(n[0].contains( System.getProperty("file.separator"))) {
             n = n[0].split("/");
@@ -186,28 +166,31 @@ public class ClientJMX {
             
             if(n[n.length-1].equals("jar") || n[n.length-1].equals("JAR")) {
                 //System.out.println("return : " + n[n.length-2] + ".jar");
-                return n[n.length-2] + ".jar";
+                value = n[n.length-2] + ".jar";
             } else {
                 //System.out.println("return : " + n[n.length-1]);
-                return n[n.length-1];
+                value = n[n.length-1];
             }
             
         } else {
             n = n[0].split("\\.");
             if(n[n.length-1].equals("jar") || n[n.length-1].equals("JAR")) {
                 //System.out.println("return : " + n[n.length-2] + ".jar");
-                return n[n.length-2] + ".jar";
+                value =  n[n.length-2] + ".jar";
             } else {
                 //System.out.println("return : " + n[n.length-1]);
-                return n[n.length-1];
+                value =  n[n.length-1];
             }
         }
+        
+        if(value.length() > 20) {
+            value = value.substring(0, 20);
+        }
+        return value;
     }
     
     /**
      * This method updates database with the news informations system.
-     * @param path The path of the database in the system.
-     * @param JVMMemory memory information of each JVM.
      */
     private void updateRrd4j() {
         
@@ -233,13 +216,13 @@ public class ClientJMX {
         systemValue[1] = SWAP;
         
         /**
-         * Set JVM values.
+         * Set JVM names.
          */
         String[] JVMDb = new String[Model.getJVMs().size()];
         for (int i = 0; i < Model.getJVMs().size() && i < 10 ; i++) {
             JVMDb[i] = Model.getJVMs().get(i).getName();
         }
-        rrd4j.addValue(dataBaseFile, systemDb, systemValue , JVMDb , Model.getMemoryTab() , Model.getColorList());
+        rrd4j.addValue(dataBaseFile, systemDb, systemValue , JVMDb , Model.getMemoryTab());
     }
     
     /**
@@ -248,7 +231,7 @@ public class ClientJMX {
      */
     private boolean getSystemInformations() {
         try {
-            /**
+                /**
                  * get Defaults informations on system.
                  */
                 OperatingSystemMXBean mxbean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
@@ -274,11 +257,19 @@ public class ClientJMX {
         return true;
     }
     
+    /**
+     * Update the rrd4j database with some memory informations.
+     * @param index JVM index in the Model.JVM Arraylist
+     * @param conn the jmx connector
+     * @param PID the process PID
+     * @param name the process name
+     * @return true if the update has done, false else.
+     */
     private boolean updateJVM(int index , JMXConnector conn , int PID , String name) {
         
         if(conn != null) {
             try {
-                double memHeap, memNonHeap; 
+                double memHeap = 0, memNonHeap = 0; 
                 
                 // Get an MBeanServerConnection
                 MBeanServerConnection mBeanServConn = conn.getMBeanServerConnection();
@@ -310,9 +301,6 @@ public class ClientJMX {
                          * Update JVMs ArrayList
                          */
                         Model.setJVM(index, new JVMData(name, PID, memHeap, memNonHeap, conn));
-                        
-                    } else {
-                        System.out.println("debug : updateJVM1");
                     } 
                 }
 
@@ -331,8 +319,9 @@ public class ClientJMX {
                                 Model.setCurrentTask((String)mBeanServConn.getAttribute( oName, "Name").toString().substring(index));
                         }
                 }
+                
+                return true;
             } catch (Exception ex) {
-                System.out.println("debug : updateJVM2");
             } 
         }
         return true;
@@ -349,6 +338,7 @@ public class ClientJMX {
         for (int index=0 ; index < Model.getJVMs().size() ; ++index) {
             try {
                 JMXConnector conn = Model.getJVMs().get(index).getConnector();
+                //Test if connection is broken or disconnect
                 if(conn.getConnectionId() != null ) {
                     
                     updateJVM(index, conn, Model.getJVMs().get(index).getPID() , Model.getJVMs().get(index).getName());
@@ -366,6 +356,10 @@ public class ClientJMX {
         return checked;
     }
     
+    /**
+     * Debug method to get current time.
+     * @param str The sentence will be display before the time.
+     */
     private void getTime(String str) {
         
         Calendar cal = Calendar.getInstance();
@@ -392,14 +386,11 @@ public class ClientJMX {
         if(!getSystemInformations()) {
             return false;
         }
-
-        
         
         /**
          * Check JVm already connected.
          */
         check = checkJVMAtStart();
-        
         
         /**
          * Start JMX scanning.
@@ -407,50 +398,37 @@ public class ClientJMX {
         JVMdetector.scan();
         for(int i = 0; i < JVMdetector.getPidTab().size() ; ++i) {
             String pid = JVMdetector.getPidTab().get(i);
+            
+            //Check if the JVM is already knew
             if(!Model.checkJVM( Integer.parseInt(pid) )) {
                 JMXConnector jmxc = JVMdetector.getJMXConnector(pid);
 
+                //If the jmx connector is activ, continue...
                 if(jmxc != null) {
 
                     String name = JVMdetector.getProcesses().get(pid).toString();
                     name = parseName(name);
                     
+                    //If we get a no empty name, register it
                     if(!name.equals("")) {
                         updateJVM(Model.addJVM(), jmxc, Integer.parseInt(pid) , name);
                         check = true;
+                    } else {
+                        try {
+                            jmxc.close();
+                        } catch (IOException ex) {
+                            Logger.getLogger(ClientJMX.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
                 }
             }
         }
+        
+        // compute total system memory used with JVM
         Model.setMemHeap( Model.getMemHeap() / (1024*1024));
         Model.setMemNonHeap( Model.getMemNonHeap() / (1024*1024));
         updateRrd4j();
 
         return check;
-    }
-    
-    public static void main(String[] args) {
-        String output = "";
-        try {
-                        
-            Process p = Runtime.getRuntime().exec("free -m");
-            BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            
-            input.readLine();input.readLine();
-            output = input.readLine();
-
-            String[] tab = output.replaceAll("\\s+", " ").split(" ");
-            
-            input.close();
-            
-            System.out.println(output);
-            System.out.println(tab[2]);
-            
-        } catch (IOException ex) {
-            Logger.getLogger(ClientJMX.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        
-        
     }
 }

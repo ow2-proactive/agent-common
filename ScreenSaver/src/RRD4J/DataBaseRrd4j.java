@@ -41,14 +41,17 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.DsType;
+import org.rrd4j.core.DsDef;
 import org.rrd4j.core.FetchData;
 import org.rrd4j.core.FetchRequest;
 import org.rrd4j.core.RrdDb;
 import org.rrd4j.core.RrdDef;
+import org.rrd4j.core.RrdToolkit;
 import org.rrd4j.core.Sample;
 import org.rrd4j.graph.RrdGraph;
 import org.rrd4j.graph.RrdGraphDef;
@@ -66,7 +69,8 @@ public class DataBaseRrd4j implements DataBase {
     private ArrayList<ChartData> systemDataSource = new ArrayList<ChartData>();
     private ArrayList<ChartData> JVMDataSource = new ArrayList<ChartData>();
     
-    private String graphPath = "./graph.gif";
+    private Random random = new Random();
+    private String graphPath = "picture.tmp";
     private String comment = "ProActive screensaver using rrd4J" ;
     private long startTime = 0L;
     private long endTime;
@@ -100,42 +104,12 @@ public class DataBaseRrd4j implements DataBase {
             f.delete();
         }
     }
-
-    /**
-     * check if the data source exist in the JVM database.
-     * @param datasource The name of the data source.
-     * @return true if it exists, false if not.
-     */
-    private boolean dataSourceJVMExist(String datasource) {
-        
-        for (ChartData data: JVMDataSource) {
-            if(data.getDataSourceName().equals(datasource)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    /**
-     * check if the data source exist in the system database.
-     * @param datasource The name of the data source.
-     * @return true if it exists, false if not.
-     */
-    private boolean dataSourceSystemExist(String datasource) {
-        
-        for (ChartData data: systemDataSource) {
-            if(data.getDataSourceName().equals(datasource)) {
-                return true;
-            }
-        }
-        return false;
-    }
     
     /**
      * debug method which count data source in the database.
      * @param path of the database.
      */
-    private void countDb(String path) {
+    private void checkBD(String path) {
         try {
             RrdDb rrdDb = new RrdDb(path);
             System.out.println("nb DataBase : " + rrdDb.getDsCount());
@@ -194,6 +168,19 @@ public class DataBaseRrd4j implements DataBase {
         this.height = height;
         this.width = width;
     }
+    
+    private Color getRandomColor() {
+        
+        int r = random.nextInt()%255;
+        int g = random.nextInt()%255;
+        int b = random.nextInt()%255;
+        
+        if(r < 0) r = -r;
+        if(g < 0) g = -g;
+        if(b < 0) b = -b;
+        
+        return new Color(r,g,b);
+    }
 
     /**
      * Create a complete database with data sources name.
@@ -201,48 +188,143 @@ public class DataBaseRrd4j implements DataBase {
      * @param path the file path of db.
      * @param dbNameSystem array of data source name for system informations.
      * @param dbNameJVM array of data source name for JVM informations.
-     * @param color array of color line.
      * @return true if all is good, false if not.
      */
-    public boolean createDB(String path, String[] dbNameSystem, String[] dbNameJVM, Color[] color) {
+    public boolean createDB(String path, String[] dbNameSystem, String[] dbNameJVM) {
+        
+        this.path = path;
         
         try {
-            if(!new File(path).exists()) {
-                try {
-                    startTime = getTime();
-                    this.path = path;
-                    
-                    RrdDef rrdDef = new RrdDef(path);
-                    rrdDef.setStartTime(startTime);
-                    rrdDef.setStep(1);
-                    rrdDef.addArchive(ConsolFun.TOTAL, 0.2, 1, 5000);
-                    
-                    for(int i = 0 ; i < dbNameSystem.length ; ++i) {
-                        systemDataSource.add( new ChartData(dbNameSystem[i], color[i]));
-                        rrdDef.addDatasource(dbNameSystem[i], DsType.GAUGE, 5000, Double.NaN, Double.NaN);
-                    }
-                    for(int i = 0 ; i < dbNameJVM.length ; ++i) {
-                        JVMDataSource.add( new ChartData(dbNameJVM[i], color[i+dbNameSystem.length]));
-                        rrdDef.addDatasource(dbNameJVM[i], DsType.GAUGE, 5000, Double.NaN, Double.NaN);
-                    }
-                    
-                    RrdDb rrdDb = new RrdDb(rrdDef);
-                    rrdDb.close();
-                } catch (IOException ex) {
-                    Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            } else {
-                System.out.println("ever exist.");
+            startTime = getTime();
+
+            RrdDef rrdDef = new RrdDef(path);
+            rrdDef.setStartTime(startTime);
+            rrdDef.setStep(1);
+            rrdDef.addArchive(ConsolFun.TOTAL, 0.2, 1, 5000);
+
+            for(int i = 0 ; i < dbNameSystem.length ; ++i) {
+                systemDataSource.add( new ChartData(dbNameSystem[i], getRandomColor()));
+                rrdDef.addDatasource(dbNameSystem[i], DsType.GAUGE, 5000, Double.NaN, Double.NaN);
             }
+            for(int i = 0 ; i < dbNameJVM.length ; ++i) {
+                JVMDataSource.add( new ChartData(dbNameJVM[i], getRandomColor()));
+                rrdDef.addDatasource(dbNameJVM[i], DsType.GAUGE, 5000, Double.NaN, Double.NaN);
+            }
+
+            RrdDb rrdDb = new RrdDb(rrdDef);
+            rrdDb.close();
+            
             // To avoid bug with future stored values (1 second minimum between each value).
             Thread.sleep(1000);
+            
         } catch (InterruptedException ex) {
             Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
+        } catch (IOException ex) {
+            Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
         }
+            
         return true;
     }
 
+    /**
+     * Check if the database file exist, if not, it will create it.
+     * @param path the database file path.
+     * @param dbSystem the system datasource name.
+     * @param dbJVMs the memory datasource name.
+     */
+    private void checkFile(String path, String[] dbSystem, String[] dbJVMs) {
+        
+        if(!new File(path).exists()) {
+                createDB( path, dbSystem , dbJVMs);
+            } 
+    }
+    
+    /**
+     * Check if a datasource name exists in the database.
+     * @param ds the datasource name.
+     * @param rrdDb the courant rrdDatabase.
+     * @return true if it exists, false else.
+     */
+    private boolean checkDsInDataBase(String ds , RrdDb rrdDb) {
+        try {
+            return rrdDb.containsDs(ds);
+        } catch (IOException ex) {
+            Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+    
+    /**
+     * Check if a datasource name exists in an array
+     * @param ds the datasource name.
+     * @param tab the data array.
+     * @return the rank if ds has been found, -1 if not.
+     */
+    private boolean checkDsInTab(String ds , String[] tab) {
+        for (int i = 0; i < tab.length; i++) {
+            if(tab[i].equals(ds)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * return the rank of a datasource name in the JVMDataSource ArrayList
+     * @param name the datasource name.
+     * @return the rank if name has been found, -1 if not.
+     */
+    private int indexOfJVMInList(String name) {
+        for (int i = 0; i < JVMDataSource.size(); i++) {
+            if(JVMDataSource.get(i).getDataSourceName().equals(name)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
+    /**
+     * This method will check each new JVM scanned in the database:
+     *      1) delete the JVMs lost
+     *      2) add the new JVM
+     * @param path the rrd4j file path.
+     * @param dbJVMs the JVMs scanned.
+     */
+    private void checkDataSources(String path, String[] dbJVMs) {
+        try {
+            RrdDb rrdDb = new RrdDb(path);
+            
+            //Check the JVM to delete in database.
+            for (int i = 2; i < rrdDb.getDsCount(); i++) {
+                if(!checkDsInTab(rrdDb.getDatasource(i).getName(), dbJVMs)) {
+                    int tmp = indexOfJVMInList(rrdDb.getDatasource(i).getName());
+                    
+                    if(tmp != -1) {
+                        
+                        System.out.println("remove " + rrdDb.getDatasource(i).getName() + " at rank : " + tmp);
+                        RrdToolkit.removeDatasource(path, rrdDb.getDatasource(i).getName(), false);
+                        JVMDataSource.remove( tmp );
+                    }
+                }
+            }
+            
+            //check the JVM to add in database.
+            for(int i = 0; i < dbJVMs.length ; ++i) {
+                
+                if( !checkDsInDataBase(dbJVMs[i] , rrdDb)) {
+                    
+                    System.out.println("add : " + dbJVMs[i]);
+                    
+                    DsDef def = new DsDef(dbJVMs[i], DsType.GAUGE, 5000, Double.NaN, Double.NaN);
+                    RrdToolkit.addDatasource(path, def, false);
+                    JVMDataSource.add( new ChartData(dbJVMs[i], getRandomColor()));
+                }
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     /**
      * update the database with news values.
      * 
@@ -251,80 +333,48 @@ public class DataBaseRrd4j implements DataBase {
      * @param valueSystem array of system values.
      * @param dbNameJVM array of data source name for JVM informations.
      * @param valueJVMs array of JVM values.
-     * @param color array of color line.
      * @return true if all is good, false if not.
      */
-    public boolean addValue(String path, String[] dbSystem, double[] valueSystem, String[] dbJVMs, double[] valueJVMs, Color[] colors) {
+    public boolean addValue(String path, String[] dbSystem, double[] valueSystem, String[] dbJVMs, double[] valueJVMs) {
+        
+        /*
+         * Check datas before insert new value.
+         */
+        checkFile( path, dbSystem , dbJVMs);
+        checkDataSources(path, dbJVMs);
+
         try {
             RrdDb rrdDb = null;
-            
-            
-            if(!new File(path).exists()) {
-                createDB( path, dbSystem , dbJVMs , colors);
-            } 
-            
-            try {
-                rrdDb = new RrdDb(path);
-                RrdDef rrdDef = rrdDb.getRrdDef();
-                
-                for (String name : dbSystem) {
-                    if(!rrdDb.containsDs(name)){
-                        rrdDef.addDatasource(name, DsType.GAUGE, 5000, Double.NaN, Double.NaN);
-                    }
-                }
-                for (String name : dbJVMs) {
-                    if(!rrdDb.containsDs(name)){
-                        rrdDef.addDatasource(name, DsType.GAUGE, 5000, Double.NaN, Double.NaN);
-                    }
-                }
-                
-                this.path = path;
+            rrdDb = new RrdDb(path);
+            Sample sample = rrdDb.createSample();
 
-                for (int i = 0; i < dbSystem.length; i++) {
-                    if(!dataSourceSystemExist(dbSystem[i])) {
-                        systemDataSource.add(new ChartData(dbSystem[i], colors[i]));
-                    }
+            //Create the new value
+            long time = getTime();
+            String val = time + "";
+
+            for (double d : valueSystem) {
+                val += ":" + d;
+            }
+            for (double d : valueJVMs) {
+                val += ":" + d;
+            }
+
+            //To avoid bug in updating values.
+            if(time - rrdDb.getLastUpdateTime() < 1) {
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                for (int i = 0; i < dbJVMs.length; i++) {
-                    if(!dataSourceJVMExist(dbJVMs[i])) {
-                        JVMDataSource.add(new ChartData(dbJVMs[i], colors[i+dbSystem.length]));
-                    }
-                }
-                
-            } catch (IOException ex) {
-                Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
-                return false;
             }
             
-            try {
-                
-                Sample sample = rrdDb.createSample();
-                
-                long time = getTime();
-                String val = time + "";
-                
-                for (double d : valueSystem) {
-                    val += ":" + d;
-                }
-                for (double d : valueJVMs) {
-                    val += ":" + d;
-                }
-                
-                sample.setAndUpdate(val);
-                
-                endTime = time;
-                rrdDb.close();
-                
-            } catch (IOException ex) {
-                Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
-                return false;
-            }
-            
-            // To avoid bug with future stored values (1 second minimum between each value).
-            Thread.sleep(1000);
-            
-            
-        } catch (InterruptedException ex) {
+            //Add value to database.
+            sample.setAndUpdate(val);
+
+            endTime = time;
+            rrdDb.close();
+
+        } catch (IOException ex) {
             Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
@@ -348,7 +398,6 @@ public class DataBaseRrd4j implements DataBase {
             graphDef.setHeight(height);
             graphDef.setWidth(width);
             
-            
             if(type == SYSTEM) {
                 for(int i = 0 ; i < systemDataSource.size() ; ++i) {
                     graphDef.datasource(
@@ -358,7 +407,6 @@ public class DataBaseRrd4j implements DataBase {
                             systemDataSource.get(i).getDataSourceName(), systemDataSource.get(i).getColor() , 
                             systemDataSource.get(i).getDataSourceName(), 1);
                 }
-                
                 graphDef.setMaxValue(100);
                 
             } else {

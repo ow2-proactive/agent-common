@@ -39,7 +39,6 @@ package ScreenSaver;
 import RRD4J.ClientJMX;
 import RRD4J.DataBaseRrd4j;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 
 /**
@@ -47,9 +46,6 @@ import java.awt.Graphics2D;
  * @author philippe Gouttefarde
  */
 public class ChartAera {
-    
-    //The graphics support on which we will draw.
-    private Graphics2D g;
     
     /* Chart Aera */
     private int Zone1X;
@@ -78,15 +74,13 @@ public class ChartAera {
     /**
      * Constructor with parameters.
      * 
-     * @param g : Graphics2D object on which we will draw graphics.
      * @param startX : X position where screensaver will start.
      * @param startY : Y position where screensaver will start.
      * @param sizeX : X size of screensaver.
      * @param sizeY : Y size of screensaver.
      * @param clientJMX : the JMX client object for listen JVM.
      */
-    public ChartAera(Graphics2D g , int startX, int startY, int sizeX, int sizeY , ClientJMX clientJMX) {
-        this.g = g;
+    public ChartAera(int startX, int startY, int sizeX, int sizeY , ClientJMX clientJMX) {
         this.Zone1X = startX;
         this.Zone1SizeX = sizeX;
         this.Zone1Y = startY;
@@ -96,21 +90,23 @@ public class ChartAera {
     
     /**
      *  The first method, the graphic begin here.
+     * @param g the Graphics2D support to paint
      */
-    public void paint(){
+    public void paint(Graphics2D g){
         
         g.setPaint(colorBackground);
         g.fillRect(Zone1X, Zone1Y - Zone1SizeY, Zone1SizeX, Zone1SizeY);
         g.setPaint(colorText);
         g.drawRect(Zone1X, Zone1Y - Zone1SizeY, Zone1SizeX, Zone1SizeY);
         
-        drawChart();
+        drawChart(g);
     }
     
     /**
      * Main method which will draw the charts.
+     * @param g the Graphics2D support to paint
      */
-    private void drawChart() {
+    private void drawChart(Graphics2D g) {
         
         int midY = Zone1Y - Zone1SizeY/2; 
         clientJMX.getDataBase().setSize(Zone1SizeX - sizeLegendX, Zone1SizeY/2 -sizeLegendY);

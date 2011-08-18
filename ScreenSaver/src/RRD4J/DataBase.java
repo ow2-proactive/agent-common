@@ -36,7 +36,6 @@
  */
 package RRD4J;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 
 /**
@@ -51,10 +50,9 @@ public interface DataBase {
      * @param path the file path of db.
      * @param dbNameSystem array of data source name for system informations.
      * @param dbNameJVM array of data source name for JVM informations.
-     * @param color array of color line.
      * @return true if all is good, false if not.
      */
-    public boolean createDB(String path,String[] dbNameSystem, String[] dbNameJVM , Color[] color);
+    public boolean createDB(String path,String[] dbNameSystem, String[] dbNameJVM);
     
     /**
      * Delete the specific database.
@@ -71,13 +69,11 @@ public interface DataBase {
      * @param valueSystem array of system values.
      * @param dbNameJVM array of data source name for JVM informations.
      * @param valueJVMs array of JVM values.
-     * @param color array of color line.
      * @return true if all is good, false if not.
      */
     public boolean addValue(String path,
             String[] dbSystem, double[] valueSystem,
-            String[] dbJVMs, double[] valueJVMs, 
-            Color[] colors);
+            String[] dbJVMs, double[] valueJVMs);
     
     /**
      * Generate graphic of system informations or JVMs informations.
