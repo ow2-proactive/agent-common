@@ -60,10 +60,6 @@ public class ChartAera {
     private Color colorBackground = Color.white;
     private Color colorText = Color.black;
     
-    //ProActive colors
-    private Color colorBlue = new Color(0x1d, 0x30 , 0x6b);
-    private Color colorOrange = new Color(0xe7, 0x74 , 0x24);
-    
     //Client JMX object
     private ClientJMX clientJMX;
     

@@ -37,8 +37,10 @@
 package ScreenSaver;
 
 import RRD4J.ClientJMX;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Stroke;
 import java.util.Calendar;
 
 /**
@@ -67,12 +69,13 @@ public class DrawingClass{
     
     private ClientJMX clientJMX;
     
-    /* BackGround */
+    /* CHART AERA */
     private int Zone1X;
     private int Zone1SizeX;
     private int Zone1Y;
     private int Zone1SizeY;
         
+    /* DATA AERA */
     private int Zone2X;
     private int Zone2SizeX;
     private int Zone2Y;
@@ -80,6 +83,10 @@ public class DrawingClass{
     
     private ChartAera chartAera;
     private DataAera dataAera;
+    
+    //ProActive colors
+    private Color colorBlue = new Color(0x1d, 0x30 , 0x6b);
+    private Color colorOrange = new Color(0xe7, 0x74 , 0x24);
     
     /**
      * 
@@ -117,6 +124,36 @@ public class DrawingClass{
     }
     
     /**
+     * Draw border with ProActive colors
+     * @param g the Graphics2D support to paint
+     */
+    private void drawBorder(Graphics2D g) {
+        
+        
+        Stroke s = g.getStroke();
+        
+        /* Blue border */
+        g.setStroke( new BasicStroke(5) );
+        g.setPaint( colorBlue );
+        g.drawLine(Zone2X, Zone2Y, Zone2X , Zone2Y + Zone2SizeY);
+        g.drawLine(Zone2X, Zone1Y , Zone2X + Zone1SizeX + Zone2SizeX, Zone1Y);
+        g.drawLine(Zone2X + Zone1SizeX + Zone2SizeX, Zone1Y, Zone2X + Zone2SizeX + Zone1SizeX, Zone2Y);
+        g.drawLine(Zone2X + Zone2SizeX + Zone1SizeX, Zone2Y, Zone2X, Zone2Y);
+        g.drawLine(MID_Aera1_Aera2 , Zone2Y, MID_Aera1_Aera2, Zone1Y);
+        
+        /* Orange border */
+        g.setStroke( new BasicStroke(1) );
+        g.setPaint( colorOrange );
+        g.drawLine(Zone2X, Zone2Y, Zone2X , Zone2Y + Zone2SizeY);
+        g.drawLine(Zone2X, Zone1Y , Zone2X + Zone1SizeX + Zone2SizeX, Zone1Y);
+        g.drawLine(Zone2X + Zone1SizeX + Zone2SizeX, Zone1Y, Zone2X + Zone2SizeX + Zone1SizeX, Zone2Y);
+        g.drawLine(Zone2X + Zone2SizeX + Zone1SizeX, Zone2Y, Zone2X, Zone2Y);
+        g.drawLine(MID_Aera1_Aera2 , Zone2Y, MID_Aera1_Aera2, Zone1Y);
+        
+        g.setStroke(s);
+    }
+    
+    /**
      * The first method, the graphic begin here.
      * @param g the Graphics2D support to paint
      */
@@ -131,6 +168,9 @@ public class DrawingClass{
 
             /* Data Aera */
             dataAera.paint(g);
+            
+            /* Border */
+            drawBorder(g);
         
         } else {
             g.drawString("No signal on JMX port...", 

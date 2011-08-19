@@ -69,6 +69,8 @@ public class DataAera {
     private Font textFont = new Font("TimesRoman" , Font.PLAIN , 12);
     private String title = "data center";
     
+    private int stringMaxSize;
+    
     /**
      * Constructor with parameters.
      * @param startX : X start coordonate of data aera on graphics2D.
@@ -81,7 +83,8 @@ public class DataAera {
         Zone2SizeX = sizeX;
         Zone2Y = startY;
         Zone2SizeY = sizeY;
-        titleX = Zone2SizeX/2 - 30;
+        titleX = Zone2SizeX/2 - title.length()*6;
+        stringMaxSize = (Zone2SizeX-20)/7;
     }
     /**
      *  The first method, the graphic begin here.
@@ -105,6 +108,13 @@ public class DataAera {
         g.drawString(title, Zone2X + titleX, Zone2Y + titleY);
     }
     
+    private String cutString(String str , int tabPix) {
+        if(str.length() > (stringMaxSize - tabPix/7)) {
+            return str.substring(0, (stringMaxSize - tabPix/7) - 3) + "...";
+        }
+        return str;
+    }
+    
     /**
      * Display some informations on system and JVMs.
      * @param g the Graphics2D support to paint
@@ -112,22 +122,22 @@ public class DataAera {
     private void drawText(Graphics2D g) {
         g.setFont(textFont);
         
-        g.drawString("Operating System : " + Model.getOperatingSystem(), Zone2X + startTextX, Zone2Y + 2*startTextY);
+        g.drawString( cutString("Operating System : " + Model.getOperatingSystem(),0), Zone2X + startTextX, Zone2Y + 2*startTextY);
         
-        g.drawString("Current Task Type : " + Model.getCurrentTask(), Zone2X + startTextX, Zone2Y + startTextY + 4*sizeLine);
+        g.drawString( cutString("Current Task Type : " + Model.getCurrentTask(),0), Zone2X + startTextX, Zone2Y + startTextY + 4*sizeLine);
         
-        g.drawString("Total memory : " + Model.getTotalMemory() + " Mo", Zone2X + startTextX, Zone2Y + startTextY + 6*sizeLine);
-        g.drawString("Free memory  : " + Model.getFreeMemory() + " Mo", Zone2X + startTextX, Zone2Y + startTextY + 7*sizeLine);
-        g.drawString("Total swap : " + Model.getTotalSwap() + " Mo", Zone2X + startTextX, Zone2Y + startTextY + 8*sizeLine);
-        g.drawString("Free swap  : " + Model.getFreeSwap() + " Mo", Zone2X + startTextX, Zone2Y + startTextY + 9*sizeLine);
+        g.drawString( cutString("Total memory : " + Model.getTotalMemory() + " Mo",0), Zone2X + startTextX, Zone2Y + startTextY + 6*sizeLine);
+        g.drawString( cutString("Free memory  : " + Model.getFreeMemory() + " Mo",0), Zone2X + startTextX, Zone2Y + startTextY + 7*sizeLine);
+        g.drawString( cutString("Total swap : " + Model.getTotalSwap() + " Mo",0), Zone2X + startTextX, Zone2Y + startTextY + 8*sizeLine);
+        g.drawString( cutString("Free swap  : " + Model.getFreeSwap() + " Mo",0), Zone2X + startTextX, Zone2Y + startTextY + 9*sizeLine);
         
-        g.drawString("Memory : ", Zone2X + startTextX, Zone2Y + startTextY + 11*sizeLine);
-        g.drawString("Heap        : " + Model.getMemHeap() + " Mo", Zone2X + startTextX +10, Zone2Y + startTextY + 12*sizeLine);
-        g.drawString("Non Heap : " + Model.getMemNonHeap() + " Mo", Zone2X + startTextX +10, Zone2Y + startTextY + 13*sizeLine);
+        g.drawString( cutString("Memory : ",0), Zone2X + startTextX, Zone2Y + startTextY + 11*sizeLine);
+        g.drawString( cutString("Heap        : " + Model.getMemHeap() + " Mo",10), Zone2X + startTextX +10, Zone2Y + startTextY + 12*sizeLine);
+        g.drawString( cutString("Non Heap : " + Model.getMemNonHeap() + " Mo",10), Zone2X + startTextX +10, Zone2Y + startTextY + 13*sizeLine);
         
-        g.drawString("Nb JVM scanned : " + Model.getJVMs().size(), Zone2X + startTextX, Zone2Y + startTextY + 15*sizeLine);
+        g.drawString( cutString("Nb JVM scanned : " + Model.getJVMs().size(),0), Zone2X + startTextX, Zone2Y + startTextY + 15*sizeLine);
         for(int i=0 ; i < Model.getJVMs().size() ; ++i) {
-            g.drawString(i + ") " + Model.getJVMs().get(i).getName(), Zone2X + startTextX +10, Zone2Y + startTextY + (16+i)*sizeLine);
+            g.drawString( cutString(i + ") " + Model.getJVMs().get(i).getName(),10), Zone2X + startTextX +10, Zone2Y + startTextY + (16+i)*sizeLine);
         }
     }
 }
