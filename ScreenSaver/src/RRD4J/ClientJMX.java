@@ -160,8 +160,8 @@ public class ClientJMX {
 
         String value;
         String[] n = name.split(" ");
-        if(n[0].contains( System.getProperty("file.separator"))) {
-            n = n[0].split("/");
+        if(n[0].contains( System.getProperty("file.separator") )) {
+            n = n[0].split( System.getProperty("file.separator") );
             n = n[n.length -1].split("\\.");
             
             if(n[n.length-1].equals("jar") || n[n.length-1].equals("JAR")) {
@@ -255,6 +255,39 @@ public class ClientJMX {
         }
         
         return true;
+    }
+    
+    private long getCpuUsage() {
+        OperatingSystemMXBean osBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+        RuntimeMXBean runBean = (RuntimeMXBean) ManagementFactory.getRuntimeMXBean();
+        int nCPUs = osBean.getAvailableProcessors();
+
+        long prevUpTime = runBean.getUptime();
+        long prevProcessCpuTime = osBean.getProcessCpuTime();
+
+        try {
+            Thread.sleep(500);
+        } catch (Exception e) {}
+
+        osBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+        long upTime = runBean.getUptime();
+        long processCpuTime = osBean.getProcessCpuTime();
+        float javaCpu;
+
+        if(prevUpTime > 0L && upTime > prevProcessCpuTime) {
+
+            long elapsedCpu  = processCpuTime - prevProcessCpuTime;
+            long elapsedTime = upTime - prevUpTime;
+            javaCpu = Math.min(99F, elapsedCpu/(elapsedTime * 10000F * nCPUs));
+        } else {
+            javaCpu = (float) 0.001;
+        }
+
+        System.out.println("CPU : " + javaCpu);
+        
+        upTime = runBean.getUptime();
+        
+        return (long)javaCpu;
     }
     
     /**
@@ -391,6 +424,11 @@ public class ClientJMX {
          * Check JVm already connected.
          */
         check = checkJVMAtStart();
+        
+        /**
+         * get Cpu Usage
+         */
+        Model.setCPU( (long)getCpuUsage() );
         
         /**
          * Start JMX scanning.

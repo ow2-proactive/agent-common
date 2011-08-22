@@ -58,6 +58,15 @@ public class Model {
     private static long freeMemory;
     private static long totalSwap;
     private static long freeSwap;
+    private static long CPU;
+
+    public static long getCPU() {
+        return CPU;
+    }
+
+    public static void setCPU(long CPU) {
+        Model.CPU = CPU;
+    }
     
     /**
      * data structure to store memory informations.

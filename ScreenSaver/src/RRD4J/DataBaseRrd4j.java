@@ -350,6 +350,15 @@ public class DataBaseRrd4j implements DataBase {
 
             //Create the new value
             long time = getTime();
+            //To avoid bug in updating values.
+            if(time - rrdDb.getLastUpdateTime() < 1) {
+                try {
+                    Thread.sleep(50);
+                    time = getTime();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
             String val = time + "";
 
             for (double d : valueSystem) {
@@ -359,14 +368,7 @@ public class DataBaseRrd4j implements DataBase {
                 val += ":" + d;
             }
 
-            //To avoid bug in updating values.
-            if(time - rrdDb.getLastUpdateTime() < 1) {
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
+            
             
             //Add value to database.
             sample.setAndUpdate(val);
