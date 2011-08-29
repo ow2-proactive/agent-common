@@ -34,9 +34,12 @@
  * ################################################################ 
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package RRD4J;
+package JMX;
 
 import Model.Model;
+import RRD4J.DataBase;
+import RRD4J.DataBaseRrd4j;
+import Util.utils;
 import com.sun.management.OperatingSystemMXBean;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -46,6 +49,7 @@ import java.lang.management.MemoryMXBean;
 import java.lang.management.RuntimeMXBean;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Set;
 import java.util.TreeSet;
@@ -66,13 +70,12 @@ public class ClientJMX {
     // database manager
     private DataBase rrd4j = new DataBaseRrd4j();
     
-    /**
-     * Concatenate at end of JVMName for identical names.
-     */
-    private int debugName = 0;
-    
     // the JVMs detector and connector
     private JVMDetector JVMdetector = new JVMDetector();
+    
+    // Local CPU usage compute
+    private long nanoBefore,nanoAfter;
+    private OperatingSystemMXBean osBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
     
     /**
      * parameter constructor
@@ -81,6 +84,16 @@ public class ClientJMX {
     public ClientJMX(String dataFile) {
         
         dataBaseFile = dataFile;
+        
+        Model.setCpuBefore( osBean.getProcessCpuTime() );
+        nanoBefore = System.nanoTime();
+        
+        ArrayList<String> JVMds = ((DataBaseRrd4j)rrd4j).init(dataFile);
+        scan();
+        
+        Model.setJVMList( utils.synchronization(Model.getJVMs(), JVMds, dataFile) );  
+        
+        ((DataBaseRrd4j)rrd4j).majInit(Model.getJVMs());
     }
     
     /**
@@ -197,34 +210,56 @@ public class ClientJMX {
         /**
          * Set system values.
          */
-        Float RAM = (float)Model.getTotalMemory();
-        RAM -= (float)Model.getFreeMemory();
-        RAM /= (float)Model.getTotalMemory();
-        RAM *= (float)100;
+        nanoAfter = System.nanoTime();
+        double CPU;
+        double cpuAfter;
+        if(nanoAfter > nanoBefore) {
+            cpuAfter = Model.getCpuJVMUsage();
+            CPU = ((cpuAfter-Model.getCpuBefore())*100)/(nanoAfter - nanoBefore);
+        } else {
+            cpuAfter = 0;
+            CPU = 0F;
+        }
         
-        Float SWAP = (float)Model.getTotalSwap();
-        SWAP -= (float)Model.getFreeSwap();
-        SWAP /= (float)Model.getTotalSwap();
-        SWAP *= (float)100;
+        if(CPU > 100 || CPU < 0){
+            CPU = 0;
+        }
+        Model.setCpuUsage(CPU);
+        Model.setCpuBefore(cpuAfter);
+        nanoBefore = nanoAfter;
+        
+        double RAM = Model.getMemHeap() + Model.getMemNonHeap();
+        RAM /= Model.getTotalMemory();
+        RAM *= 100;
+        
+        if(RAM > 100 || RAM < 0) {
+            RAM = 0;
+        }
         
         String[] systemDb = new String[2];
-        systemDb[0] = "RAM";
-        systemDb[1] = "SWAP";
+        systemDb[0] = "JVMs Memory usage";
+        systemDb[1] = "JVMs CPU usage";
         
         double[] systemValue = new double[2];
         systemValue[0] = RAM;
-        systemValue[1] = SWAP;
+        systemValue[1] = CPU;
+        
+        System.out.println("CPU : " + CPU + ", RAM : " + RAM);
         
         /**
          * Set JVM names.
          */
+        System.out.println("JVMs size : " + Model.getJVMs().size());
+        
         String[] JVMDb = new String[Model.getJVMs().size()];
         for (int i = 0; i < Model.getJVMs().size() && i < 10 ; i++) {
-            JVMDb[i] = Model.getJVMs().get(i).getName();
+            JVMDb[i] =    utils.getHashCode(Model.getJVMs().get(i).getName() + " " 
+                        + Model.getJVMs().get(i).getPID() + " " 
+                        + Model.getJVMs().get(i).getStartTime());
         }
         rrd4j.addValue(dataBaseFile, systemDb, systemValue , JVMDb , Model.getMemoryTab());
     }
-    
+
     /**
      * get system informations.
      * @return true if all is good, false if not.
@@ -240,6 +275,7 @@ public class ClientJMX {
                 if (mem == 0) {
                     return false;
                 }
+                
                 Model.setFreeMemory(Model.getTotalMemory() - mem);
                 Model.setTotalSwap(mxbean.getTotalSwapSpaceSize() / (1024*1024));
                 Model.setFreeSwap(mxbean.getFreeSwapSpaceSize() / (1024*1024));
@@ -255,39 +291,6 @@ public class ClientJMX {
         }
         
         return true;
-    }
-    
-    private long getCpuUsage() {
-        OperatingSystemMXBean osBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-        RuntimeMXBean runBean = (RuntimeMXBean) ManagementFactory.getRuntimeMXBean();
-        int nCPUs = osBean.getAvailableProcessors();
-
-        long prevUpTime = runBean.getUptime();
-        long prevProcessCpuTime = osBean.getProcessCpuTime();
-
-        try {
-            Thread.sleep(500);
-        } catch (Exception e) {}
-
-        osBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-        long upTime = runBean.getUptime();
-        long processCpuTime = osBean.getProcessCpuTime();
-        float javaCpu;
-
-        if(prevUpTime > 0L && upTime > prevProcessCpuTime) {
-
-            long elapsedCpu  = processCpuTime - prevProcessCpuTime;
-            long elapsedTime = upTime - prevUpTime;
-            javaCpu = Math.min(99F, elapsedCpu/(elapsedTime * 10000F * nCPUs));
-        } else {
-            javaCpu = (float) 0.001;
-        }
-
-        System.out.println("CPU : " + javaCpu);
-        
-        upTime = runBean.getUptime();
-        
-        return (long)javaCpu;
     }
     
     /**
@@ -315,10 +318,12 @@ public class ClientJMX {
                 Model.addToHeap( memBean.getHeapMemoryUsage().getUsed() );
                 Model.addToNonHeap( memBean.getNonHeapMemoryUsage().getUsed() );
 
+                OperatingSystemMXBean osMxBean = (OperatingSystemMXBean) ManagementFactory.newPlatformMXBeanProxy(mBeanServConn,
+                                        ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
                 /*
                  * get back some information
                  */
-                if(mBeanRuntime != null) {
+                if(mBeanRuntime != null && osMxBean != null) {
 
                     if(!name.equals("")){
 
@@ -333,7 +338,7 @@ public class ClientJMX {
                         /*
                          * Update JVMs ArrayList
                          */
-                        Model.setJVM(index, new JVMData(name, PID, memHeap, memNonHeap, conn));
+                        Model.setJVM(index, new JVMData(name, PID, mBeanRuntime.getStartTime(), memHeap, memNonHeap, osMxBean.getProcessCpuTime(), conn));
                     } 
                 }
 
@@ -355,6 +360,7 @@ public class ClientJMX {
                 
                 return true;
             } catch (Exception ex) {
+                System.out.println( ex.getMessage() );
             } 
         }
         return true;
@@ -371,15 +377,22 @@ public class ClientJMX {
         for (int index=0 ; index < Model.getJVMs().size() ; ++index) {
             try {
                 JMXConnector conn = Model.getJVMs().get(index).getConnector();
-                //Test if connection is broken or disconnect
-                if(conn.getConnectionId() != null ) {
-                    
-                    updateJVM(index, conn, Model.getJVMs().get(index).getPID() , Model.getJVMs().get(index).getName());
-                    checked = true;
+                
+                if(conn != null) {
+                   //Test if connection is broken or disconnect
+                    if(conn.getConnectionId() != null ) {
+
+                        updateJVM(index, conn, Model.getJVMs().get(index).getPID() , Model.getJVMs().get(index).getName());
+                        checked = true;
+                    } else {
+                        System.out.println("Broken connection detected for : " + Model.getJVMs().get(index).getName());
+                        Model.removeJVMByPID(Model.getJVMs().get(index).getPID());
+                    } 
                 } else {
                     System.out.println("Broken connection detected for : " + Model.getJVMs().get(index).getName());
                     Model.removeJVMByPID(Model.getJVMs().get(index).getPID());
-                }
+                } 
+                
             } catch (IOException ex) {
                 System.out.println("Broken connection detected for : " + Model.getJVMs().get(index).getName());
                 Model.removeJVMByPID(Model.getJVMs().get(index).getPID());
@@ -401,11 +414,10 @@ public class ClientJMX {
     }
     
     /**
-     * Run JMX listener
-     * @return True if the listen has ran, False if not.
+     * launch JMX scan, to detect JVMs
+     * @return 
      */
-    public boolean runJmx() {
-        
+    private boolean scan() {
         /*
          * Initialization.
          */
@@ -424,11 +436,6 @@ public class ClientJMX {
          * Check JVm already connected.
          */
         check = checkJVMAtStart();
-        
-        /**
-         * get Cpu Usage
-         */
-        Model.setCPU( (long)getCpuUsage() );
         
         /**
          * Start JMX scanning.
@@ -465,6 +472,20 @@ public class ClientJMX {
         // compute total system memory used with JVM
         Model.setMemHeap( Model.getMemHeap() / (1024*1024));
         Model.setMemNonHeap( Model.getMemNonHeap() / (1024*1024));
+        
+        return check;
+    }
+    
+    /**
+     * Run JMX listener
+     * @return True if the listen has ran, False if not.
+     */
+    public boolean runJmx() {
+        
+        //launch scan
+        boolean check = scan();
+        
+        //update database
         updateRrd4j();
 
         return check;

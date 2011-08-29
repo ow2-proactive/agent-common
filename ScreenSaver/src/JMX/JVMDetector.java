@@ -34,7 +34,7 @@
  * ################################################################ 
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package RRD4J;
+package JMX;
 
 import java.io.BufferedReader;
 import java.io.File;

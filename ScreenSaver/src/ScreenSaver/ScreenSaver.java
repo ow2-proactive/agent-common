@@ -111,7 +111,7 @@ public class ScreenSaver {
             DrawingClass draw = new DrawingClass(bitmap.getWidth(),bitmap.getHeight() , dataFile);
 
             
-            new File(dataFile).delete();
+            //new File(dataFile).delete();
             new File(pictureFile).delete();
 
             template = init(template,x,y);
@@ -140,6 +140,19 @@ public class ScreenSaver {
         }
     } 
     
+    
+    /**
+     * The entry point of screensaver.
+     * @param argv :
+     *           // BMP file path
+     *           argv[0] 
+     *           // rrd4j file path
+     *           argv[1] 
+     *           // X size of screen
+     *           argv[2]
+     *           // Y size of screen
+     *           argv[3]
+     */
     public static void main( String[] argv ) {
             
         if(argv.length == 4) {

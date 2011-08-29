@@ -44,6 +44,7 @@ import Xlib
 import Xlib.display
 from subprocess import Popen
 import signal
+import time
 
   
 # The model of the Daemon, contain all functions.
@@ -52,8 +53,7 @@ class Model:
     config_file = '/usr/bin/PAAgent/log.txt'
     pid_file = '/usr/bin/PAAgent/pid.tmp'
     
-    def launcher(self,command):
-        user = commands.getoutput( 'whoami' )
+    def launcher(self,command,user):
         log = login.Login()
         if log.checkAccess(user):
             if command == 'startJVM':
@@ -71,8 +71,7 @@ class Model:
     def startJVM(self,user):
         #log part
         f = open( self.config_file ,'a')
-        current_time = commands.getstatusoutput( 'date' )
-        line = user + ' started JVM at : ' + str(current_time[1]) + '\n'
+        line = user + ' started JVM at : ' + time.ctime() + ' with Server/Proxy \n'
         f.write( line )
         f.close() 
         
@@ -91,8 +90,7 @@ class Model:
     
     def stopJVM(self,user):
         f = open( self.config_file ,'a')
-        current_time = commands.getstatusoutput( 'date' )
-        line = user + ' stopped JVM at : ' + str(current_time[1]) + '\n'
+        line = user + ' stopped JVM at : ' + time.ctime() +  ' with Server/Proxy \n'
         f.write( line )
         f.close()   
         if os.path.exists( self.pid_file ):

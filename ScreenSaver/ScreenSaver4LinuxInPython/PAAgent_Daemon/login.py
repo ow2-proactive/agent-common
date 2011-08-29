@@ -51,14 +51,18 @@ class Login:
         items_users = config.items('USERS-ACCESS')
         items_groups = config.items('GROUPS-ACCESS')
 
-	right = False
+        own = commands.getoutput( 'whoami' )
+        if own == username:
+            return False
 
-	user_groups = commands.getoutput('groups' + username)
-	user_groups_list = user_groups.split()
-	#Get only the group name
-	user_groups_list = user_groups_list[2::]
-
-	# Tests for group name
+    	right = False
+    
+    	user_groups = commands.getoutput('groups' + username)
+    	user_groups_list = user_groups.split()
+    	#Get only the group name
+    	user_groups_list = user_groups_list[2::]
+    
+    	# Tests for group name
         for group_l in items_groups: 
 	    for group_u in user_groups_list:
 		    # user[NAME,RIGHTS]

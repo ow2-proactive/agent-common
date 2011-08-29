@@ -108,6 +108,12 @@ public class DataAera {
         g.drawString(title, Zone2X + titleX, Zone2Y + titleY);
     }
     
+    /**
+     * Cut string that it does not exceed the aera.
+     * @param str the string to cut.
+     * @param tabPix the optional tabulation length
+     * @return the string split
+     */
     private String cutString(String str , int tabPix) {
         if(str.length() > (stringMaxSize - tabPix/7)) {
             return str.substring(0, (stringMaxSize - tabPix/7) - 3) + "...";
@@ -131,13 +137,15 @@ public class DataAera {
         g.drawString( cutString("Total swap : " + Model.getTotalSwap() + " Mo",0), Zone2X + startTextX, Zone2Y + startTextY + 8*sizeLine);
         g.drawString( cutString("Free swap  : " + Model.getFreeSwap() + " Mo",0), Zone2X + startTextX, Zone2Y + startTextY + 9*sizeLine);
         
-        g.drawString( cutString("Memory : ",0), Zone2X + startTextX, Zone2Y + startTextY + 11*sizeLine);
-        g.drawString( cutString("Heap        : " + Model.getMemHeap() + " Mo",10), Zone2X + startTextX +10, Zone2Y + startTextY + 12*sizeLine);
-        g.drawString( cutString("Non Heap : " + Model.getMemNonHeap() + " Mo",10), Zone2X + startTextX +10, Zone2Y + startTextY + 13*sizeLine);
+        g.drawString( cutString("JVMs CPU usage : " + Model.getCpuUsage() + " %",0), Zone2X + startTextX, Zone2Y + startTextY + 11*sizeLine);
         
-        g.drawString( cutString("Nb JVM scanned : " + Model.getJVMs().size(),0), Zone2X + startTextX, Zone2Y + startTextY + 15*sizeLine);
+        g.drawString( cutString("JVMs Memory : ",0), Zone2X + startTextX, Zone2Y + startTextY + 13*sizeLine);
+        g.drawString( cutString("Heap        : " + Model.getMemHeap() + " Mo",10), Zone2X + startTextX +10, Zone2Y + startTextY + 14*sizeLine);
+        g.drawString( cutString("Non Heap : " + Model.getMemNonHeap() + " Mo",10), Zone2X + startTextX +10, Zone2Y + startTextY + 15*sizeLine);
+        
+        g.drawString( cutString("Nb JVM scanned : " + Model.getJVMs().size(),0), Zone2X + startTextX, Zone2Y + startTextY + 17*sizeLine);
         for(int i=0 ; i < Model.getJVMs().size() ; ++i) {
-            g.drawString( cutString(i + ") " + Model.getJVMs().get(i).getName(),10), Zone2X + startTextX +10, Zone2Y + startTextY + (16+i)*sizeLine);
+            g.drawString( cutString(i + ") " + Model.getJVMs().get(i).getName(),10), Zone2X + startTextX +10, Zone2Y + startTextY + (18+i)*sizeLine);
         }
     }
 }

@@ -34,7 +34,7 @@
  * ################################################################ 
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package RRD4J;
+package JMX;
 
 import javax.management.remote.JMXConnector;
 
@@ -50,8 +50,10 @@ public class JVMData {
     
     private String name;
     private int PID;
+    private long startTime;
     private double memHeap;
     private double memNonHeap;
+    private double cpu;
     private JMXConnector connector;
     
     /**
@@ -69,12 +71,30 @@ public class JVMData {
      * @param memNonHeap the JVM memory non Heap
      * @param connector  the JMX connector
      */
-    public JVMData(String name, int PID, double memHeap, double memNonHeap , JMXConnector connector) {
+    public JVMData(String name, int PID, long startTime, double memHeap, double memNonHeap, double cpu , JMXConnector connector) {
         this.name = name;
         this.PID = PID;
+        this.startTime = startTime;
         this.memHeap = memHeap;
         this.memNonHeap = memNonHeap;
+        this.cpu = cpu;
         this.connector = connector;
+    }
+    
+    /**
+     * startTime getter
+     * @return the startTime
+     */
+    public long getStartTime() {
+        return startTime;
+    }
+    
+    /**
+     * cpu usage getter
+     * @return the cpu usage
+     */
+    public double getCPU() {
+        return cpu;
     }
     
     /**

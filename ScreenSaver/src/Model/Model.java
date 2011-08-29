@@ -36,7 +36,8 @@
  */
 package Model;
 
-import RRD4J.JVMData;
+import JMX.JVMData;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import javax.management.remote.JMXConnector;
 
@@ -58,25 +59,62 @@ public class Model {
     private static long freeMemory;
     private static long totalSwap;
     private static long freeSwap;
-    private static long CPU;
-
-    public static long getCPU() {
-        return CPU;
-    }
-
-    public static void setCPU(long CPU) {
-        Model.CPU = CPU;
-    }
-    
+    private static double cpuBefore;
+    private static double cpuUsage;
+        
     /**
      * data structure to store memory informations.
      */
     private static ArrayList<JVMData> JVMs = new ArrayList<JVMData>();
 
     /**
-     * Concatenate at end of JVMName for identical names.
+     * return CPU usage value of total JVMs scanned
+     * @return CPU usage
      */
-    private int debugName = 0;
+    public static double getCpuUsage() {
+        return cpuUsage;
+    }
+
+    /**
+     * setter CPU usage of total JVMs scanned
+     * @param cpuUsage CPU usage
+     */
+    public static void setCpuUsage(double cpuUsage) {
+        String tmp = new DecimalFormat("#0.00").format(cpuUsage);
+        Model.cpuUsage = Double.parseDouble(tmp);
+    }
+    
+    /**
+     * compute all CPU value in JVMs list and return result
+     * @return CPU usage
+     */
+    public static double getCpuJVMUsage() {
+        double cpu = 0;
+        
+        for (JVMData jvm : JVMs) {
+            cpu += jvm.getCPU();
+        }
+        return cpu;
+    }
+    
+    
+    /**
+     * return the last value of CPU usage
+     * @return last CPU usage
+     */
+    public static double getCpuBefore() {
+        return cpuBefore;
+    }
+
+    
+    /**
+     * setter of last CPU usage
+     * @param cpuBefore the last CPU value
+     */
+    public static void setCpuBefore(double cpuBefore) {
+        Model.cpuBefore = cpuBefore;
+    }
+
     
     /**
      * return the total memory of each JVM in a tab for the rrd4j database.
@@ -108,7 +146,7 @@ public class Model {
      * @param conn the JMX connector of the JVM.
      * @return true if the JVM has been add, false if not.
      */
-    public static boolean addJVM(String name, int PID, double memHeap, double memNonHeap, JMXConnector conn) {
+    public static boolean addJVM(String name, int PID, long startTime, double memHeap, double memNonHeap, double cpu, JMXConnector conn) {
         
         if(Model.checkJVM(PID)) {
             System.out.println("Exist already : " + name);
@@ -116,7 +154,7 @@ public class Model {
         }
         
         System.out.println("JVM added : " + name);
-        JVMs.add(new JVMData(name, PID, memHeap, memNonHeap, conn));
+        JVMs.add(new JVMData(name, PID, startTime , memHeap, memNonHeap, cpu, conn));
         return true;
     }
     
@@ -129,6 +167,14 @@ public class Model {
         if(index < JVMs.size()) {
             JVMs.set(index, data);
         }
+    }
+    
+    /**
+     * setter of JVMs complete list.
+     * @param list 
+     */
+    public static void setJVMList( ArrayList<JVMData> list ) {
+        JVMs = list;
     }
     
     /**

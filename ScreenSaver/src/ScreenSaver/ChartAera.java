@@ -36,7 +36,7 @@
  */
 package ScreenSaver;
 
-import RRD4J.ClientJMX;
+import JMX.ClientJMX;
 import RRD4J.DataBaseRrd4j;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -107,7 +107,7 @@ public class ChartAera {
         int midY = Zone1Y - Zone1SizeY/2; 
         clientJMX.getDataBase().setSize(Zone1SizeX - sizeLegendX, Zone1SizeY/2 -sizeLegendY);
         
-        g.drawImage(clientJMX.getDataBase().createGraphic(SYSTEM, "System informations"), null, Zone1X, Zone1Y - Zone1SizeY);
-        g.drawImage(clientJMX.getDataBase().createGraphic(JVM , "JVMs informations"), null, Zone1X, midY);
+        g.drawImage(clientJMX.getDataBase().createGraphic(SYSTEM, "Total JVMs information"), null, Zone1X, Zone1Y - Zone1SizeY);
+        g.drawImage(clientJMX.getDataBase().createGraphic(JVM , "Single JVMs information"), null, Zone1X, midY);
     }
 }

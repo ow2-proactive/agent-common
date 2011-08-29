@@ -1,0 +1,119 @@
+#!/usr/bin/env python
+
+#
+# ################################################################
+#
+# ProActive Parallel Suite(TM): The Java(TM) library for
+#    Parallel, Distributed, Multi-Core Computing for
+#    Enterprise Grids & Clouds
+#
+# Copyright (C) 1997-2011 INRIA/University of
+#                 Nice-Sophia Antipolis/ActiveEon
+# Contact: proactive@ow2.org or contact@activeeon.com
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License
+# as published by the Free Software Foundation; version 3 of
+# the License.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+# USA
+#
+# If needed, contact us to obtain a release under GPL Version 2 or 3
+# or a different license than the AGPL.
+#
+#  Initial developer(s):               The ActiveEon Team
+#                        http://www.activeeon.com/
+#  Contributor(s):
+#
+# ################################################################ 
+# $$ACTIVEEON_CONTRIBUTOR$$
+#
+import os
+
+import gtk
+from gtk import gdk
+import time
+
+def is_screensaver_mode():
+    return GsThemeWindow().get_anid()
+
+class GsThemeWindow(gtk.Window):
+    __gtype_name__ = 'GsThemeWindow'
+
+    image_file = '/tmp/ScreenSaver.bmp'
+    image = gtk.Image()
+
+    def do_realize(self):
+        print 3
+        anid = self.get_anid()
+        if anid:
+            print 4
+            self.window = gdk.window_foreign_new(anid)
+            self.window.set_events(gdk.EXPOSURE_MASK | gdk.STRUCTURE_MASK)
+        else:
+            print 5
+            self.window = gdk.Window(
+                self.get_parent_window(),
+                width=self.allocation.width,
+                height=self.allocation.height,
+                window_type=gdk.WINDOW_TOPLEVEL,
+                wclass=gdk.INPUT_OUTPUT,
+                event_mask=self.get_events() | gdk.EXPOSURE_MASK)
+
+        self.window.set_user_data(self)
+        x, y, self.w, self.h, depth = self.window.get_geometry()
+        self.size_allocate(gdk.Rectangle(x=x, y=y, width=self.w, height=self.h))
+        self.set_default_size(self.w, self.h)
+	
+        self.set_flags(self.flags() | gtk.REALIZED)
+        self.set_decorated(False)
+        self.style.attach(self.window)
+        self.style.set_background(self.window, gtk.STATE_NORMAL)
+        self.modify_bg(gtk.STATE_NORMAL, gdk.color_parse("black"))
+
+        self.add(self.image)
+
+    def anim(self):
+        
+        while not os.path.isfile( self.image_file ) :
+            print 'waiting for : ' + self.image_file
+            time.sleep( 1 )
+        
+        self.remove(self.image)
+        
+        image = gtk.Image()
+        self.add(image)
+        image.show()
+        image.set_from_file( self.image_file )
+        
+        self.image = image
+        self.show_all()
+
+    def get_anid(self):
+        print 6
+        id = os.environ.get('XSCREENSAVER_WINDOW')
+        return int(id, 16) if id else None
+
+if __name__ == "__main__":
+    window = GsThemeWindow()
+    window.show()
+    
+    print 1
+    
+    while True:
+         
+        print 2
+        window.anim() 
+        gtk.main_iteration()
+        
+        time.sleep(1)       
+        
+

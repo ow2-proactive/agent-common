@@ -85,13 +85,6 @@ public interface DataBase {
     public BufferedImage createGraphic(int type , String title);
     
     /**
-     * Set path for the graph file.
-     * 
-     * @param path Path for the future graph. 
-     */
-    public void setGraphFile(String path);
-    
-    /**
      * Give the size of the future graph.
      * 
      * @param height Height of the graph.

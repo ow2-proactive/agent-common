@@ -36,7 +36,7 @@
  */
 package ScreenSaver;
 
-import RRD4J.ClientJMX;
+import JMX.ClientJMX;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;

@@ -36,6 +36,8 @@
  */
 package RRD4J;
 
+import JMX.JVMData;
+import Util.utils;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -70,7 +72,7 @@ public class DataBaseRrd4j implements DataBase {
     private ArrayList<ChartData> JVMDataSource = new ArrayList<ChartData>();
     
     private Random random = new Random();
-    private String graphPath = "picture.tmp";
+    private String graphPath = "/tmp/tmp.gif";
     private String comment = "ProActive screensaver using rrd4J" ;
     private long startTime = 0L;
     private long endTime;
@@ -83,6 +85,55 @@ public class DataBaseRrd4j implements DataBase {
     private long halfMinuteDuration = 30L;
     
     private long currentDuration = minute15Duration;
+    
+    /**
+     * Initialize database file and ArrayList before start scanning.
+     * @param path Path of the data base file.
+     * @return An ArrayList of JVM name contained in file. 
+     */
+    public ArrayList<String> init(String path) {
+        
+        this.path = path;
+        
+        if(new File(path).exists()) {
+            
+            ArrayList<String> list = new ArrayList<String>();
+            
+            try {
+                RrdDb rrdDb = new RrdDb(path);
+                String[] ds = rrdDb.getDsNames();
+                int i;
+                for (i=0 ; i < 2 ; ++i) {
+                        systemDataSource.add( new ChartData(ds[i], getRandomColor() ));
+                }
+                
+                for (i=2 ; i < ds.length ; ++i) {
+                        list.add( ds[i] );
+                }
+                
+                return list;
+            } catch (IOException ex) {
+                Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Update the JVMList after initialize the application.
+     * @param list the initialized arraylist.
+     */
+    public void majInit(ArrayList<JVMData> list) {
+        
+        if(list != null) {
+           for (JVMData data : list) {
+                JVMDataSource.add( new ChartData( utils.getHashCode(
+                        data.getName() + " " + data.getPID() + " " + data.getStartTime())
+                        , getRandomColor() ));
+            } 
+        }
+    }
     
     /**
      * Return the current timestamp in seconds.
@@ -109,16 +160,20 @@ public class DataBaseRrd4j implements DataBase {
      * debug method which count data source in the database.
      * @param path of the database.
      */
-    private void checkBD(String path) {
-        try {
-            RrdDb rrdDb = new RrdDb(path);
-            System.out.println("nb DataBase : " + rrdDb.getDsCount());
-            String[] ds = rrdDb.getDsNames();
-            for (String name : ds) {
-                System.out.println("name : " + name);
+    public void checkBD(String path) {
+        
+        if(new File(path).exists()) {
+        
+            try {
+                RrdDb rrdDb = new RrdDb(path);
+                System.out.println("nb DataBase : " + rrdDb.getDsCount());
+                String[] ds = rrdDb.getDsNames();
+                for (String name : ds) {
+                    System.out.println("name : " + name);
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } catch (IOException ex) {
-            Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -131,7 +186,7 @@ public class DataBaseRrd4j implements DataBase {
         
         try {
             RrdDb rrdDb = new RrdDb(path);
-            FetchRequest fetchRequest = rrdDb.createFetchRequest(ConsolFun.TOTAL, endTime - currentDuration, endTime);
+            FetchRequest fetchRequest = rrdDb.createFetchRequest(ConsolFun.TOTAL, startTime , endTime);
             FetchData fetchData = fetchRequest.fetchData();
             double[][] result = fetchData.getValues();
             
@@ -147,15 +202,6 @@ public class DataBaseRrd4j implements DataBase {
         } catch (IOException ex) {
             Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-
-    /**
-     * setter of the graph path.
-     * @param path of the graph file, if we want to export it.
-     */
-    @Override
-    public void setGraphFile(String path) {
-        this.graphPath = path;
     }
 
     /**
@@ -340,6 +386,7 @@ public class DataBaseRrd4j implements DataBase {
         /*
          * Check datas before insert new value.
          */
+        this.path = path;
         checkFile( path, dbSystem , dbJVMs);
         checkDataSources(path, dbJVMs);
 
@@ -351,9 +398,9 @@ public class DataBaseRrd4j implements DataBase {
             //Create the new value
             long time = getTime();
             //To avoid bug in updating values.
-            if(time - rrdDb.getLastUpdateTime() < 1) {
+            if(time - rrdDb.getLastUpdateTime() <= 1) {
                 try {
-                    Thread.sleep(50);
+                    Thread.sleep(1000);
                     time = getTime();
                 } catch (InterruptedException ex) {
                     Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
@@ -368,8 +415,6 @@ public class DataBaseRrd4j implements DataBase {
                 val += ":" + d;
             }
 
-            
-            
             //Add value to database.
             sample.setAndUpdate(val);
 
@@ -392,8 +437,9 @@ public class DataBaseRrd4j implements DataBase {
      * @return a BufferedImage containing the graph. 
      */
     public BufferedImage createGraphic(int type , String title) {
+        
         try{
-                startTime = endTime - currentDuration;
+            startTime = endTime - currentDuration;
             
             RrdGraphDef graphDef = new RrdGraphDef();
             graphDef.setTimeSpan(startTime, endTime);
