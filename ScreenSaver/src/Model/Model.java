@@ -80,7 +80,13 @@ public class Model {
      * @param cpuUsage CPU usage
      */
     public static void setCpuUsage(double cpuUsage) {
+
+        System.out.println("cpu : " + cpuUsage);
+
         String tmp = new DecimalFormat("#0.00").format(cpuUsage);
+
+        tmp = tmp.replace(',', '.');
+
         Model.cpuUsage = Double.parseDouble(tmp);
     }
     
