@@ -1,0 +1,11 @@
+
+[Desktop Entry]
+Name=ProActive
+Exec=/usr/lib/xscreensaver/ProActive -root
+TryExec=/usr/lib/xscreensaver/ProActive
+Comment=ProActive Screensaver
+StartupNotify=false
+Terminal=false
+Type=Application
+Categories=Screensaver;
+OnlyShowIn=GNOME;

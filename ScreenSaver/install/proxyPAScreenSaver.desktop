@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Proxy ProActive ScreenSaver
+Comment=Proxy ProActive ScreenSaver
+Exec=python /usr/bin/ProActiveScreenSaver/proxy.py
+OnlyShowIn=GNOME;
+X-GNOME-Autostart-Phase=Application
