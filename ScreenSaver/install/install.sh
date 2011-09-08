@@ -42,9 +42,8 @@ echo "PROACTIVESS is set as : $path"
 
 # environnement variable for $PROACTIVESS
 comm="PROACTIVESS=\"$path\" >> /etc/environment"
-echo "comm : $comm"
 sh -c "echo $comm"
-echo "add PROACTIVESS=\"$PROACTIVESS\" at the end of /etc/environment [OK]"
+echo "add PROACTIVESS=\"$path\" at the end of /etc/environment [OK]"
 
 # Main directory for Pro Active ScreenSaver 
 mkdir $path
@@ -54,7 +53,6 @@ chmod 755 $path
 chmod 755 $path/proxy.py
 chown -R proactive $path
 echo "./PAScreenSaver/ => $path [OK]"
-
 
 # The ProActive ScreenSaver 
 cp ./ProActiveScreenSaver /usr/lib/xscreensaver/ProActive
@@ -70,12 +68,16 @@ echo "./ProActiveScreenSaver.desktop => /usr/share/applications/screensavers/Pro
 
 # autostart proxy at system boot for all users
 cp ./proxyPAScreenSaver.desktop /usr/share/gnome/autostart/proxyPAScreenSaver.desktop
+comm="Exec=python $path/proxy.py >> /usr/share/gnome/autostart/proxyPAScreenSaver.desktop"
+sh -c "echo $comm"
 chmod 744 /usr/share/gnome/autostart/proxyPAScreenSaver.desktop
 chown root /usr/share/gnome/autostart/proxyPAScreenSaver.desktop
 echo "./proxyPAScreenSaver.desktop => /usr/share/gnome/autostart/proxyPAScreenSaver.desktop [OK]"
 
 # autostart server at system boot for proactive user
-cp ServeurProActiveScreenSaver.sh /etc/init.d/
+cp ./ServeurProActiveScreenSaver.sh /etc/init.d/ServeurProActiveScreenSaver
+comm="su proactive -c \'python $path/server.py \&\' >> /etc/init.d/ServeurProActiveScreenSaver"
+sh -c "echo $comm"
 update-rc.d ServeurProActiveScreenSaver.sh defaults
 chmod +x /etc/init.d/ServeurProActiveScreenSaver.sh
 echo "./ServeurProActiveScreenSaver.sh => /etc/init.d/ServeurProActiveScreenSaver.sh [OK]"
