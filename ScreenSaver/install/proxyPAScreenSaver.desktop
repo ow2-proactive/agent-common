@@ -4,4 +4,3 @@ Name=Proxy ProActive ScreenSaver
 Comment=Proxy ProActive ScreenSaver
 OnlyShowIn=GNOME;
 X-GNOME-Autostart-Phase=Application
-Exec=python /usr/bin/ProActive/proxy.py
