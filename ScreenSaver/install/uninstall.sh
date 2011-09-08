@@ -28,6 +28,6 @@ sudo rm /usr/share/gnome/autostart/proxyPAScreenSaver.desktop
 echo "remove /usr/share/gnome/autostart/proxyPAScreenSaver.desktop file"
 
 # autostart server at system boot for proactive user
-sudo update-rc.d -f ServeurProActiveScreenSaver.sh remove
-sudo rm /etc/init.d/ServeurProActiveScreenSaver.sh
-echo "remove /etc/init.d/ServeurProActiveScreenSaver.sh file"
+sudo update-rc.d -f ServeurProActiveScreenSaver remove
+sudo rm /etc/init.d/ServeurProActiveScreenSaver
+echo "remove /etc/init.d/ServeurProActiveScreenSaver file"

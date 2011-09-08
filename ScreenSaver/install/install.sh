@@ -78,8 +78,8 @@ echo "./proxyPAScreenSaver.desktop => /usr/share/gnome/autostart/proxyPAScreenSa
 cp ./ServeurProActiveScreenSaver.sh /etc/init.d/ServeurProActiveScreenSaver
 comm="su proactive -c \'python $path/server.py \&\' >> /etc/init.d/ServeurProActiveScreenSaver"
 sh -c "echo $comm"
-update-rc.d ServeurProActiveScreenSaver.sh defaults
-chmod +x /etc/init.d/ServeurProActiveScreenSaver.sh
-echo "./ServeurProActiveScreenSaver.sh => /etc/init.d/ServeurProActiveScreenSaver.sh [OK]"
+update-rc.d ServeurProActiveScreenSaver defaults
+chmod +x /etc/init.d/ServeurProActiveScreenSaver
+echo "./ServeurProActiveScreenSaver.sh => /etc/init.d/ServeurProActiveScreenSaver [OK]"
 
 
