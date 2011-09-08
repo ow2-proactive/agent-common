@@ -1,8 +1,19 @@
 #!/bin/sh
 
+if [ $USER != 'root' ]; then
+	echo "REQUIRES ROOT"
+	exit 0
+fi
+
+#Check variable envirronement PROACTIVESS
+if [ -z "$PROACTIVESS" ]; then
+	echo "please set PROACTIVESS in your environment variables."
+	exit 1
+fi
+
 # Main directory for Pro Active ScreenSaver 
-sudo rm -r /usr/bin/ProActiveScreenSaver
-echo "remove /usr/bin/ProActiveScreenSaver folder"
+sudo rm -r $PROACTIVESS
+echo "remove $PROACTIVESS folder"
 
 # The ProActive ScreenSaver 
 sudo rm /usr/lib/xscreensaver/ProActive
