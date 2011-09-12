@@ -5,37 +5,31 @@ if [ $USER != 'root' ]; then
 	exit 0
 fi
 
-PROACTIVESS="$0/.."
-
-#echo "Uninstall ProActive ScreenSaver...."
-#echo "Path to install application : "
-#read PROACTIVESS
-
-#export PROACTIVESS=$PROACTIVESS
-
-#Check variable envirronement PROACTIVESS
-#if [ -z "$PROACTIVESS" ]; then
-#	echo "please set PROACTIVESS in your environment variables."
-#	exit 1
-#fi
+PROACTIVESS=`pwd`
 
 # Main directory for Pro Active ScreenSaver 
-sudo rm -rf $PROACTIVESS
-echo "remove $PROACTIVESS folder"
+rm -rf $PROACTIVESS
+echo "remove $PROACTIVESS folder [OK]"
 
 # The ProActive ScreenSaver 
-sudo rm /usr/lib/xscreensaver/ProActive
-echo "remove  /usr/lib/xscreensaver/ProActive file"
+rm /usr/lib/xscreensaver/ProActive
+echo "remove  /usr/lib/xscreensaver/ProActive file [OK]"
 
 # The ProActive ScreenSaver  .desktop
-sudo rm /usr/share/applications/screensavers/ProActive.desktop
-echo "remove /usr/share/applications/screensavers/ProActive.desktop file"
+rm /usr/share/applications/screensavers/ProActive.desktop
+echo "remove /usr/share/applications/screensavers/ProActive.desktop file [OK]"
 
 # autostart proxy at system boot for all users
-sudo rm /usr/share/gnome/autostart/proxyPAScreenSaver.desktop
-echo "remove /usr/share/gnome/autostart/proxyPAScreenSaver.desktop file"
+rm /usr/share/gnome/autostart/proxyPAScreenSaver.desktop
+echo "remove /usr/share/gnome/autostart/proxyPAScreenSaver.desktop file [OK]"
 
 # autostart server at system boot for proactive user
-sudo update-rc.d -f ServeurProActiveScreenSaver remove
-sudo rm /etc/init.d/ServeurProActiveScreenSaver
-echo "remove /etc/init.d/ServeurProActiveScreenSaver file"
+update-rc.d -f ServeurProActiveScreenSaver remove
+rm /etc/init.d/ServeurProActiveScreenSaver
+echo "remove /etc/init.d/ServeurProActiveScreenSaver file [OK]"
+
+# remove export line in /etc/environment file
+grep -v "PROACTIVESS" /etc/environment > /etc/environment2
+rm /etc/environment
+mv /etc/environment2 /etc/environment
+echo "remove export line in /etc/environment file [OK]"
