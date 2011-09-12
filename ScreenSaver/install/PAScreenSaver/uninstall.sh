@@ -5,14 +5,22 @@ if [ $USER != 'root' ]; then
 	exit 0
 fi
 
+PROACTIVESS="$0/.."
+
+#echo "Uninstall ProActive ScreenSaver...."
+#echo "Path to install application : "
+#read PROACTIVESS
+
+#export PROACTIVESS=$PROACTIVESS
+
 #Check variable envirronement PROACTIVESS
-if [ -z "$PROACTIVESS" ]; then
-	echo "please set PROACTIVESS in your environment variables."
-	exit 1
-fi
+#if [ -z "$PROACTIVESS" ]; then
+#	echo "please set PROACTIVESS in your environment variables."
+#	exit 1
+#fi
 
 # Main directory for Pro Active ScreenSaver 
-sudo rm -r $PROACTIVESS
+sudo rm -rf $PROACTIVESS
 echo "remove $PROACTIVESS folder"
 
 # The ProActive ScreenSaver 

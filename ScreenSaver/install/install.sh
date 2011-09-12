@@ -76,7 +76,9 @@ echo "./proxyPAScreenSaver.desktop => /usr/share/gnome/autostart/proxyPAScreenSa
 
 # autostart server at system boot for proactive user
 cp ./ServeurProActiveScreenSaver.sh /etc/init.d/ServeurProActiveScreenSaver
-comm="su proactive -c \'python $path/server.py \&\' >> /etc/init.d/ServeurProActiveScreenSaver"
+comm="su proactive -c \'python $path/server.py clean\' >> /etc/init.d/ServeurProActiveScreenSaver"
+sh -c "echo $comm"
+comm="su proactive -c \'python $path/server.py start \&\' >> /etc/init.d/ServeurProActiveScreenSaver"
 sh -c "echo $comm"
 update-rc.d ServeurProActiveScreenSaver defaults
 chmod +x /etc/init.d/ServeurProActiveScreenSaver

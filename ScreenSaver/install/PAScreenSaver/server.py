@@ -120,19 +120,43 @@ class Server():
 
 if __name__ == "__main__":
 
+    main_dir = os.environ["PROACTIVESS"]
+    file_name = main_dir + "/resource/pid.tmp"
+
     if len(sys.argv) == 2:
         comm = sys.argv[1]
+        print "command : " + comm
 	if comm == "clean":
 	   
-	   
-	    pipe_path = "/tmp/ss.pipe" 
-	    pipe = open(pipe_path, 'w')
-	    pipe.close()
-	    os.remove(pipe_path)
-	    print "named pipe file : " + pipe_path + " has removed."
-    else:
-	    server = Server()
+	    if os.path.exists( file_name ):
+                os.remove(file_name)
+                print "removed : " + file_name + "."
+        elif comm == "start":
+            if os.path.exists( file_name ):
+                print "Impossible to execute several instances of ProActive server."
+                exit(1)
+            
+            else:
+            	
+            	f = open(file_name, 'w')
+            	f.write("Server PID = " + str(os.getpid()) )
+            	f.close()
+            
+                server = Server()
 
-	    # Activate the server; this will keep running until you
-	    # interrupt the program with Ctrl-C
-	    server.listen()
+                # Activate the server; this will keep running until you
+                # interrupt the program with Ctrl-C
+                server.listen()
+        else:
+            print "Help:"
+            print ""
+            print "start : launch an instance of server."
+            print "clean : remove pid.tmp in order to launch another instance of server."
+            print "help : print this help menu."
+            
+    else:
+        print "Help:"
+        print ""
+        print "start : launch an instance of server."
+        print "clean : remove pid.tmp in order to launch another instance of server."
+        print "help : print this help menu."
