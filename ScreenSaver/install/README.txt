@@ -15,13 +15,15 @@ All users need access to $PATH/proxy.py in execution.
 
 Select ProActive screensaver in your screensavers preferences pop-up.
 
-Then, restart computer and enjoy it.
-
 CONFIG:
 
-If installation finished without problem, go to $PATH, and edit $PATH/configSS.txt, 
+If installation finished without problem, go to $PATH, and edit $PATH/config.txt, 
 you must write path to binaries of jdk 1.6 at least allow for proactive user.
 
 exemple : jdk=$JDK_PATH/bin
 
-Then open config.txt and set access policy for your users.
+Then open $PATH/access.txt and set access policy for your users.
+
+Then, restart computer and enjoy it.
+
+

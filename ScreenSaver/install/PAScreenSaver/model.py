@@ -60,11 +60,12 @@ class Model:
     startLog = "Starting java proactive screensaver... \n"
     stopLog = "Stopping java proactive screensaver... \n"
     killLog = "Killing process : "
+    killLogError = "Unable to kill JVM."
     
     def init(self):
 	if self.MAIN_DIR[-1:] == "/":
 	    self.MAIN_DIR = self.MAIN_DIR[:-1]
-	self.writeLOG("ProActiveScreenSaver directory set as : " + self.MAIN_DIR + " at " + time.ctime())
+	self.writeLOG("ProActiveScreenSaver directory set as : " + self.MAIN_DIR + " at " + time.ctime() + "\n")
 
     def launcher(self,command,user, x=0 , y=0 , java_path=''):
         log = login.Login()
@@ -128,6 +129,7 @@ class Model:
 	        self.writeLOG(self.stopLog)
 	    except :
 		print "There is no process catched for : " + str(self.pid)
+                self.writeLOG(self.killLogError)
 		
             
        

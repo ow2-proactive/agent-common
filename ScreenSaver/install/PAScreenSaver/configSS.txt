@@ -1,2 +1,0 @@
-[SCREENSAVER-CONFIG]
-jdk=/home/proactive/Téléchargements/jdk1.6.0_27/bin

@@ -120,7 +120,30 @@ public class DataAera {
         }
         return str;
     }
-    
+
+    /**
+     * Display the JVMs list in text aera. An information message is displayed if
+     * no one proactive JVM is detected.
+     * @param startLine it is the line where the list will start in the text aera.
+     */
+    private void displayJVMList(Graphics2D g , int startLine) {
+
+        int size = Model.getJVMs().size();
+
+        g.drawString( cutString("Nb JVM scanned : " + size,0), Zone2X + startTextX, Zone2Y + startTextY + startLine*sizeLine);
+
+        if(size > 0) {
+            for(int i=0 ; i < size ; ++i) {
+                g.drawString( cutString(i + ") " + Model.getJVMs().get(i).getName(),10), Zone2X + startTextX +10, Zone2Y + startTextY + (startLine+1+i)*sizeLine);
+            }
+        } else {
+            g.drawString( "No one JVM is detected.", Zone2X + startTextX +10, Zone2Y + startTextY + (startLine+2)*sizeLine);
+            g.drawString( "It may that you don't have rights or", Zone2X + startTextX +10, Zone2Y + startTextY + (startLine+3)*sizeLine);
+            g.drawString( "ProActive Agent is not running.", Zone2X + startTextX +10, Zone2Y + startTextY + (startLine+4)*sizeLine);
+        }
+        
+    }
+
     /**
      * Display some informations on system and JVMs.
      * @param g the Graphics2D support to paint
@@ -142,10 +165,7 @@ public class DataAera {
         g.drawString( cutString("JVMs Memory : ",0), Zone2X + startTextX, Zone2Y + startTextY + 13*sizeLine);
         g.drawString( cutString("Heap        : " + Model.getMemHeap() + " Mo",10), Zone2X + startTextX +10, Zone2Y + startTextY + 14*sizeLine);
         g.drawString( cutString("Non Heap : " + Model.getMemNonHeap() + " Mo",10), Zone2X + startTextX +10, Zone2Y + startTextY + 15*sizeLine);
-        
-        g.drawString( cutString("Nb JVM scanned : " + Model.getJVMs().size(),0), Zone2X + startTextX, Zone2Y + startTextY + 17*sizeLine);
-        for(int i=0 ; i < Model.getJVMs().size() ; ++i) {
-            g.drawString( cutString(i + ") " + Model.getJVMs().get(i).getName(),10), Zone2X + startTextX +10, Zone2Y + startTextY + (18+i)*sizeLine);
-        }
+
+        displayJVMList(g, 17);
     }
 }
