@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# author : philippe Gouttefarde
+
 id=`id -u`
 
 if [ $USER != 'root' -a $id==0 ]; then
@@ -84,4 +86,8 @@ update-rc.d ServeurProActiveScreenSaver defaults
 chmod +x /etc/init.d/ServeurProActiveScreenSaver
 echo "./ServeurProActiveScreenSaver.sh => /etc/init.d/ServeurProActiveScreenSaver [OK]"
 
-
+echo " "
+echo "*-------------------------------------*"
+echo "Installation is now complete."
+echo "You can configure < ${path}/config.txt > file and set your JDK/bin path (at least 1.6 release)."
+echo "Thanks for choosing ProActive screensaver."

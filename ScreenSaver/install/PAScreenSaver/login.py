@@ -37,6 +37,8 @@
 # $$ACTIVEEON_CONTRIBUTOR$$
 #
 
+# author : philippe Gouttefarde
+
 import commands
 import string
 import ConfigParser
@@ -44,7 +46,7 @@ import ConfigParser
 # A class Login to check differents access of the Daemon using ConfigParser standard API of Python
 class Login:
     
-    config_file = 'config.txt'
+    config_file = 'access.txt'
 
     def checkAccess(self,username , main_dir): 
         config = ConfigParser.RawConfigParser()

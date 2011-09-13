@@ -37,6 +37,8 @@
 # $$ACTIVEEON_CONTRIBUTOR$$
 #
 
+# author : philippe Gouttefarde
+
 import login
 import commands
 import os

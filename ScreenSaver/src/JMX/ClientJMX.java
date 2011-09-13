@@ -52,12 +52,9 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.management.MBeanServerConnection;
-import javax.management.ObjectName;
 import javax.management.remote.JMXConnector;
 
 /**
@@ -259,6 +256,10 @@ public class ClientJMX {
                         + Model.getJVMs().get(i).getStartTime());
             System.out.println("JVM : " + JVMDb[i]);
         }
+        
+        /*
+         * Add a new entry in database.
+         */
         rrd4j.addValue(dataBaseFile, systemDb, systemValue , JVMDb , Model.getMemoryTab());
     }
 

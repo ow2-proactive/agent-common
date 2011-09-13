@@ -215,6 +215,10 @@ public class DataBaseRrd4j implements DataBase {
         this.width = width;
     }
     
+    /**
+     * Return a random color for the new curves.
+     * @return a random color.
+     */
     private Color getRandomColor() {
         
         int r = random.nextInt()%255;

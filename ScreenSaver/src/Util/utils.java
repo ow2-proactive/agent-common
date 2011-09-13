@@ -172,6 +172,12 @@ public class utils {
         return result;
     }
     
+    /**
+     * Return the hashcode of a string.
+     * Usefull for build a single name for each datasource in database.
+     * @param str a tempory datasource name
+     * @return the hashcode of datasource name
+     */
     public static String getHashCode(String str) {
         return str.hashCode() + "";
     } 

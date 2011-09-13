@@ -37,6 +37,8 @@
 # $$ACTIVEEON_CONTRIBUTOR$$
 #
 
+# author : philippe Gouttefarde
+
 from gobject import MainLoop
 from dbus import SessionBus
 from dbus.mainloop.glib import DBusGMainLoop
@@ -47,9 +49,16 @@ import commands
 import os
 import time
 
+'''
+    This proxy listen to events on org.gnome.ScreenSaver dbus.
+    If statut switch to True, proxy send START signal to local server with username and screen size.
+    If status switch to False, proxy send STOP signal, and server substract an user. If total users using 
+    screensaver fall to zero, the .jar stop.
+'''
+
 class SSTrigger:
 	
-    # FORMAT MESSAGE : [START/STOP] [USERNAME]
+    # FORMAT MESSAGE : [START/STOP] [USERNAME] [X] [Y]
 	
     start = 'START'
     stop = 'STOP'
@@ -74,6 +83,7 @@ class SSTrigger:
         
         if ssOn == 1: #Screensaver turned on
 
+            #Allow proactive user to get information on the graphical session.
 	    commands.getoutput("xhost +")
 
             data = self.start + " " + commands.getoutput( 'whoami' ) + " " + x + " " + y

@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# author : philippe Gouttefarde
+
 if [ $USER != 'root' ]; then
 	echo "REQUIRES ROOT"
 	exit 0

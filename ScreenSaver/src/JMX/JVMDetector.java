@@ -78,10 +78,17 @@ public class JVMDetector {
    private Map processes = null;
    private Map jmx = null;
    
+   /**
+    * Default constructor.
+    * Initialize jdk home path.
+    */
    public JVMDetector() {
        initPath();
    }
    
+   /**
+    * Clear the PID array.
+    */
    public void resetPidTab() {
        pidTab.clear();
    }

@@ -1,10 +1,2 @@
-[USERS-ACCESS]
-pgouttef = yes
-admin = yes
-test = yes
-proactive = yes
-
-[GROUPS-ACCESS]
-admin = yes
-adm = yes
-test = no
+[SCREENSAVER-CONFIG]
+jdk=/path/to/JDK/bin

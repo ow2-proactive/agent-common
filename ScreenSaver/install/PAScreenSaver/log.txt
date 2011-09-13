@@ -1,195 +1,38 @@
+/*
+ * ################################################################
+ *
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
+ *
+ * Copyright (C) 1997-2011 INRIA/University of
+ *                 Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ *
+ *  Initial developer(s):               The ActiveEon Team
+ *                        http://www.activeeon.com/
+ *  Contributor(s):
+ *
+ * ################################################################ 
+ * $$ACTIVEEON_CONTRIBUTOR$$
+ */
 
-pgouttef started JVM at : Thu Sep  1 15:05:44 2011 with Server/Proxy 
-Nb client(s) is now : 1
-Starting java proactive screensaver... 
-pgouttef stopped JVM at : Thu Sep  1 15:06:27 2011 with Server/Proxy 
-Nb client(s) is now : 0
-Stopping java proactive screensaver... 
-pgouttef started JVM at : Thu Sep  1 15:06:31 2011 with Server/Proxy 
-Nb client(s) is now : 1
-Starting java proactive screensaver... 
-pgouttef stopped JVM at : Thu Sep  1 15:14:18 2011 with Server/Proxy 
-Nb client(s) is now : 0
-pgouttef started JVM at : Thu Sep  1 15:22:16 2011 with Server/Proxy 
-Nb client(s) is now : 1
-Starting java proactive screensaver... 
-pgouttef stopped JVM at : Thu Sep  1 15:23:22 2011 with Server/Proxy 
-Nb client(s) is now : 0
-Killing process : 2635
-Stopping java proactive screensaver... 
-proactive started JVM at : Thu Sep  1 15:24:33 2011 with Server/Proxy 
-Nb client(s) is now : 1
-Starting java proactive screensaver... 
-proactive stopped JVM at : Thu Sep  1 15:24:53 2011 with Server/Proxy 
-Nb client(s) is now : 0
-Killing process : 3415
-Stopping java proactive screensaver... 
-pgouttef stopped JVM at : Thu Sep  1 15:34:07 2011 with Server/Proxy 
-Nb client(s) is now : 0
-pgouttef started JVM at : Thu Sep  1 15:42:20 2011 with Server/Proxy 
-Nb client(s) is now : 1
-Starting java proactive screensaver... 
-pgouttef stopped JVM at : Thu Sep  1 15:42:46 2011 with Server/Proxy 
-Nb client(s) is now : 0
-pgouttef started JVM at : Fri Sep  2 09:28:58 2011 with Server/Proxy 
-Nb client(s) is now : 1
-Starting java proactive screensaver... 
-pgouttef stopped JVM at : Fri Sep  2 09:30:37 2011 with Server/Proxy 
-Nb client(s) is now : 0
-Killing process : 1915
-Stopping java proactive screensaver... 
-pgouttef stopped JVM at : Fri Sep  2 10:17:42 2011 with Server/Proxy 
-Nb client(s) is now : 0
-create /tmp/ss.pipeCheck JVM pathPath : /usr/lib/jvm/jdk1.6/jre/bin/javacreate /tmp/ss.pipe
-Check JVM pathPath : /usr/lib/jvm/jdk1.6/jre/bin/java
-create /tmp/ss.pipe
-Check JVM path
-Path : /usr/lib/jvm/jdk1.6/jre/bin/java
-open pipe in read mode.remove /tmp/ss.pipe
-create /tmp/ss.pipe
-Check JVM path
-Path : /usr/lib/jvm/jdk1.6/jre/bin/java
-open pipe in read mode.remove /tmp/ss.pipe
-create /tmp/ss.pipe
-Check JVM path
-Path : /usr/lib/jvm/jdk1.6/jre/bin/java
-open pipe in read mode.pgouttef started JVM at : Fri Sep  2 10:56:37 2011 with Server/Proxy 
-Nb client(s) is now : 1
-Starting java proactive screensaver... 
-pgouttef stopped JVM at : Fri Sep  2 10:56:52 2011 with Server/Proxy 
-Nb client(s) is now : 0
-remove /tmp/ss.pipe
-create /tmp/ss.pipe
-Check JVM path
-Path : /usr/lib/jvm/jdk1.6/jre/bin/java
-open pipe in read mode.remove /tmp/ss.pipe
-create /tmp/ss.pipe
-Check JVM path
-Path : /usr/lib/jvm/jdk1.6/jre/bin/java
-open pipe in read mode.pgouttef started JVM at : Fri Sep  2 11:41:35 2011 with Server/Proxy 
-Nb client(s) is now : 1
-Starting java proactive screensaver... 
-pgouttef stopped JVM at : Fri Sep  2 11:41:40 2011 with Server/Proxy 
-Nb client(s) is now : 0
-remove /tmp/ss.pipe
-create /tmp/ss.pipe
-Check JVM path
-Path : /usr/lib/jvm/jdk1.6/jre/bin/java
-open pipe in read mode.pgouttef started JVM at : Fri Sep  2 11:42:56 2011 with Server/Proxy 
-Nb client(s) is now : 1
-Starting java proactive screensaver... 
-pgouttef stopped JVM at : Fri Sep  2 11:43:20 2011 with Server/Proxy 
-Nb client(s) is now : 0
-Killing process : 3562
-Stopping java proactive screensaver... 
-remove /tmp/ss.pipe
-create /tmp/ss.pipe
-Check JVM path
-Path : /usr/lib/jvm/jdk1.6/jre/bin/java
-open pipe in read mode.pgouttef started JVM at : Fri Sep  2 13:49:11 2011 with Server/Proxy 
-Nb client(s) is now : 1
-Starting java proactive screensaver... 
-pgouttef stopped JVM at : Fri Sep  2 13:49:18 2011 with Server/Proxy 
-Nb client(s) is now : 0
-create /tmp/ss.pipe
-Check JVM path
-Path : /usr/lib/jvm/jdk1.6/jre/bin/java
-open pipe in read mode.pgouttef started JVM at : Fri Sep  2 13:55:25 2011 with Server/Proxy 
-Nb client(s) is now : 1
-Starting java proactive screensaver... 
-pgouttef stopped JVM at : Fri Sep  2 13:56:43 2011 with Server/Proxy 
-Nb client(s) is now : 0
-Killing process : 1987
-Stopping java proactive screensaver... 
-pgouttef stopped JVM at : Fri Sep  2 13:57:07 2011 with Server/Proxy 
-Nb client(s) is now : 0
-create /tmp/ss.pipe
-Check JVM path
-Path : /usr/lib/jvm/jdk1.6/jre/bin/java
-open pipe in read mode.proactive started JVM at : Fri Sep  2 14:20:00 2011 with Server/Proxy 
-Nb client(s) is now : 1
-Starting java proactive screensaver... 
-pgouttef stopped JVM at : Fri Sep  2 14:21:25 2011 with Server/Proxy 
-Nb client(s) is now : 0
-Killing process : 1928
-Stopping java proactive screensaver... 
-create /tmp/ss.pipe
-Check JVM path
-Path : /usr/lib/jvm/jdk1.6/jre/bin/java
-open pipe in read mode.pgouttef stopped JVM at : Fri Sep  2 14:29:15 2011 with Server/Proxy 
-Nb client(s) is now : 0
-create /tmp/ss.pipe
-Check JVM path
-Path : /usr/lib/jvm/jdk1.6/jre/bin/java
-open pipe in read mode.pgouttef stopped JVM at : Fri Sep  2 14:35:36 2011 with Server/Proxy 
-Nb client(s) is now : 0
-remove /tmp/ss.pipe
-create /tmp/ss.pipe
-Check JVM path
-Path : /usr/lib/jvm/jdk1.6/jre/bin/java
-open pipe in read mode.pgouttef started JVM at : Fri Sep  2 14:37:35 2011 with Server/Proxy 
-Nb client(s) is now : 1
-Starting java proactive screensaver... 
-pgouttef stopped JVM at : Fri Sep  2 14:37:39 2011 with Server/Proxy 
-Nb client(s) is now : 0
-Killing process : 2108
-Stopping java proactive screensaver... 
-pgouttef started JVM at : Fri Sep  2 14:37:49 2011 with Server/Proxy 
-Nb client(s) is now : 1
-Starting java proactive screensaver... 
-pgouttef stopped JVM at : Fri Sep  2 14:38:08 2011 with Server/Proxy 
-Nb client(s) is now : 0
-Killing process : 2175
-Stopping java proactive screensaver... 
-create /tmp/ss.pipe
-Check JVM path
-Path : /usr/lib/jvm/jdk1.6/jre/bin/java
-open pipe in read mode.pgouttef stopped JVM at : Fri Sep  2 14:40:54 2011 with Server/Proxy 
-Nb client(s) is now : 0
-remove /tmp/ss.pipe
-create /tmp/ss.pipe
-Check JVM path
-Path : /usr/lib/jvm/jdk1.6/jre/bin/java
-open pipe in read mode.pgouttef started JVM at : Fri Sep  2 14:41:42 2011 with Server/Proxy 
-Nb client(s) is now : 1
-Starting java proactive screensaver... 
-pgouttef stopped JVM at : Fri Sep  2 14:41:59 2011 with Server/Proxy 
-Nb client(s) is now : 0
-Killing process : 2119
-Stopping java proactive screensaver... 
-create /tmp/ss.pipe
-Check JVM path
-Path : /usr/lib/jvm/jdk1.6/jre/bin/java
-open pipe in read mode.
-pgouttef started JVM at : Fri Sep  2 14:47:08 2011 with Server/Proxy 
-Nb client(s) is now : 1
-Starting java proactive screensaver... 
-pgouttef stopped JVM at : Fri Sep  2 14:50:54 2011 with Server/Proxy 
-Nb client(s) is now : 0
-Killing process : 1966
-Stopping java proactive screensaver... 
-create /tmp/ss.pipe
-Check JVM path
-Path : /usr/lib/jvm/jdk1.6/jre/bin/java
-open pipe in read mode.
-pgouttef started JVM at : Fri Sep  2 14:58:08 2011 with Server/Proxy 
-Nb client(s) is now : 1
-Starting java proactive screensaver... 
-pgouttef stopped JVM at : Fri Sep  2 14:58:23 2011 with Server/Proxy 
-Nb client(s) is now : 0
-Killing process : 1933
-Stopping java proactive screensaver... 
-pgouttef started JVM at : Fri Sep  2 15:03:09 2011 with Server/Proxy 
-Nb client(s) is now : 1
-Starting java proactive screensaver... 
-pgouttef stopped JVM at : Fri Sep  2 15:05:50 2011 with Server/Proxy 
-Nb client(s) is now : 0
-Killing process : 2106
-Stopping java proactive screensaver... 
-pgouttef started JVM at : Fri Sep  2 15:23:17 2011 with Server/Proxy 
-Nb client(s) is now : 1
-Starting java proactive screensaver... 
-pgouttef stopped JVM at : Fri Sep  2 15:39:50 2011 with Server/Proxy 
-Nb client(s) is now : 0
-Killing process : 4173
-Stopping java proactive screensaver... 
+    < LOG FILE FOR PROACTIVE SCREENSAVER >
