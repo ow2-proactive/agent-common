@@ -383,6 +383,8 @@ public class DataBaseRrd4j implements DataBase {
      */
     public boolean addValue(String path, String[] dbSystem, double[] valueSystem, String[] dbJVMs, double[] valueJVMs) {
         
+        
+        checkBD(path);
         /*
          * Check datas before insert new value.
          */

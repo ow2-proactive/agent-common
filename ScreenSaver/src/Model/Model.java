@@ -81,8 +81,6 @@ public class Model {
      */
     public static void setCpuUsage(double cpuUsage) {
 
-        System.out.println("cpu : " + cpuUsage);
-
         String tmp = new DecimalFormat("#0.00").format(cpuUsage);
 
         tmp = tmp.replace(',', '.');
@@ -135,6 +133,16 @@ public class Model {
         return mem;
     }
 
+    /**
+     * remove the last JVM.
+     */
+    public static void removeLastJVM() {
+        int last = JVMs.size() - 1;
+        if(last >= 0) {
+            JVMs.remove(last);
+        }
+    }
+    
     /**
      * return a JVM list.
      * @return a JVM list.
@@ -189,8 +197,9 @@ public class Model {
      * @return true if it has been found, false if not.
      */
     public static boolean checkJVM(int PID) {
-        
+        System.out.println("check " + PID + " : ");
         for(int i = 0; i < JVMs.size() ; ++i) {
+            System.out.println("\t" + JVMs.get(i).getPID());
             if(JVMs.get(i).getPID() == PID) {
                 return true;
             }

@@ -51,6 +51,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -76,6 +77,9 @@ public class ClientJMX {
     // Local CPU usage compute
     private long nanoBefore,nanoAfter;
     private OperatingSystemMXBean osBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+    
+    //Argument to check:
+    String argToCheck = "-Dproactive.agent.rank=";
     
     /**
      * parameter constructor
@@ -244,18 +248,16 @@ public class ClientJMX {
         systemValue[0] = RAM;
         systemValue[1] = CPU;
         
-        System.out.println("CPU : " + CPU + ", RAM : " + RAM);
-        
         /**
          * Set JVM names.
          */
-        System.out.println("JVMs size : " + Model.getJVMs().size());
         
         String[] JVMDb = new String[Model.getJVMs().size()];
         for (int i = 0; i < Model.getJVMs().size() && i < 10 ; i++) {
             JVMDb[i] =    utils.getHashCode(Model.getJVMs().get(i).getName() + " " 
                         + Model.getJVMs().get(i).getPID() + " " 
                         + Model.getJVMs().get(i).getStartTime());
+            System.out.println("JVM : " + JVMDb[i]);
         }
         rrd4j.addValue(dataBaseFile, systemDb, systemValue , JVMDb , Model.getMemoryTab());
     }
@@ -303,6 +305,7 @@ public class ClientJMX {
      */
     private boolean updateJVM(int index , JMXConnector conn , int PID , String name) {
         
+        boolean checkJVM = false;
         if(conn != null) {
             try {
                 double memHeap = 0, memNonHeap = 0; 
@@ -315,9 +318,6 @@ public class ClientJMX {
 
                 MemoryMXBean memBean = ManagementFactory.newPlatformMXBeanProxy(mBeanServConn, ManagementFactory.MEMORY_MXBEAN_NAME, MemoryMXBean.class ); 
 
-                Model.addToHeap( memBean.getHeapMemoryUsage().getUsed() );
-                Model.addToNonHeap( memBean.getNonHeapMemoryUsage().getUsed() );
-
                 OperatingSystemMXBean osMxBean = (OperatingSystemMXBean) ManagementFactory.newPlatformMXBeanProxy(mBeanServConn,
                                         ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
                 /*
@@ -327,35 +327,37 @@ public class ClientJMX {
 
                     if(!name.equals("")){
 
-                        memHeap = memBean.getHeapMemoryUsage().getUsed();
-                        memHeap = (memHeap/Model.getTotalMemory()) * 100;
-                        memHeap /= 1024*1024;
-                        
-                        memNonHeap = memBean.getNonHeapMemoryUsage().getUsed();
-                        memNonHeap = (memNonHeap/Model.getTotalMemory()) * 100;
-                        memNonHeap /= 1024*1024;
-                        
                         /*
-                         * Update JVMs ArrayList
+                         * Check agent's JVMs.
                          */
-                        Model.setJVM(index, new JVMData(name, PID, mBeanRuntime.getStartTime(), memHeap, memNonHeap, osMxBean.getProcessCpuTime(), conn));
+                        List<String> args = mBeanRuntime.getInputArguments();
+                        for (String arg : args) {
+                            if(arg.startsWith( argToCheck )) {
+                                System.out.println(name + " is [OK]");
+                            
+                                Model.addToHeap( memBean.getHeapMemoryUsage().getUsed() );
+                                Model.addToNonHeap( memBean.getNonHeapMemoryUsage().getUsed() );
+                            
+                                /*
+                                 * Update JVMs ArrayList
+                                 */
+                                memHeap = memBean.getHeapMemoryUsage().getUsed();
+                                memHeap = (memHeap/Model.getTotalMemory()) * 100;
+                                memHeap /= 1024*1024;
+
+                                memNonHeap = memBean.getNonHeapMemoryUsage().getUsed();
+                                memNonHeap = (memNonHeap/Model.getTotalMemory()) * 100;
+                                memNonHeap /= 1024*1024;
+
+                                Model.setJVM(index, new JVMData(name, PID, mBeanRuntime.getStartTime(), memHeap, memNonHeap, osMxBean.getProcessCpuTime(), conn));
+                                checkJVM = true;
+                            }
+                        }
                     } 
                 }
 
-                /*
-                 * Check if there are any tasks in JVM.
-                 */
-                Set<ObjectName> names =
-                    new TreeSet<ObjectName>(mBeanServConn.queryNames(null, null));
-
-                /*
-                 * check for a task name.
-                 */
-                for (ObjectName oName : names) {
-                        if(name.toString().startsWith("org.objectweb.proactive.core.body")) {
-                                int i = mBeanServConn.getAttribute( oName, "Name").toString().lastIndexOf(".") + 1;
-                                Model.setCurrentTask((String)mBeanServConn.getAttribute( oName, "Name").toString().substring(index));
-                        }
+                if(!checkJVM) {
+                    Model.removeLastJVM();
                 }
                 
                 return true;
