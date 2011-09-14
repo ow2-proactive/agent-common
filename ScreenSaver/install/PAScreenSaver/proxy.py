@@ -78,15 +78,15 @@ class SSTrigger:
         screen_res = screen.split('x')
     
         #Screensize	
-        x = screen_res[0]
-        y = screen_res[1]
+        length = screen_res[0]
+        width = screen_res[1]
         
         if ssOn == 1: #Screensaver turned on
 
             #Allow proactive user to get information on the graphical session.
-	    commands.getoutput("xhost +")
+	    #commands.getoutput("xhost +")
 
-            data = self.start + " " + commands.getoutput( 'whoami' ) + " " + x + " " + y
+            data = self.start + " " + commands.getoutput( 'whoami' ) + " " + length + " " + width
             
 	    pipe = open(self.pipe_path, 'w')
 	    
@@ -97,7 +97,7 @@ class SSTrigger:
 
         else: #Screensaver turned off
  	    
- 	    data = self.stop + " " + commands.getoutput( 'whoami' ) + " " + x + " " + y
+ 	    data = self.stop + " " + commands.getoutput( 'whoami' ) + " " + length + " " + width
             
 	    pipe = open(self.pipe_path, 'w')
 	    

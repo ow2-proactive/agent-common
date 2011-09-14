@@ -80,7 +80,7 @@ class Server():
     java_version_required = "A Java version 1.6 is required at least."
     java_version = 1
     java_subversion = 6 
-    java_path = ""
+    jdk_path = ""
 
 
     def listen(self):
@@ -106,14 +106,14 @@ class Server():
         self.model.writeLOG("Checking JVM path at " + time.ctime() + "\n")
         self.checkJAVA_HOME()
 	
-	if len(self.java_path) > 1 :
-		self.model.writeLOG("Java founded : " + self.java_path + "\n")		
+	if len(self.jdk_path) > 1 :
+		self.model.writeLOG("Java founded : " + self.jdk_path + "\n")
 			
 		'''
 			IF IT'S GOOD, RUN THE LISTENNER
 		'''
 		print "Starting listenning..."
-		self.model.init()
+		self.model.init(self.jdk_path)
 
 		os.chmod(self.pipe_path, stat.S_IRWXU | stat.S_IWGRP | stat.S_IWOTH)
 		pipe = open(self.pipe_path, 'r')
@@ -133,7 +133,7 @@ class Server():
 			    self.y = tab[3]
 			    
 			    if self.comm == self.start :
-				self.startJVM(self.username,self.x,self.y,self.java_path)
+				self.startJVM(self.username,self.x,self.y,self.jdk_path)
 			    
 			    elif self.comm == self.stop:
 				self.stopJVM(self.username)
@@ -145,8 +145,8 @@ class Server():
 	else:
 		print self.java_version_required
         
-    def startJVM(self , username , x , y , java_path):
-        self.model.launcher('startJVM' , username , x , y , java_path)
+    def startJVM(self , username , x , y , jdk_path):
+        self.model.launcher('startJVM' , username , x , y , jdk_path)
             
     def stopJVM(self , username):
         self.model.launcher('stopJVM' , username)
@@ -162,7 +162,7 @@ class Server():
 
     	jdkPath = conf[0][1]
 	print "jdk path : " + jdkPath 
-	self.java_path = jdkPath
+	self.jdk_path = jdkPath
 
 
 if __name__ == "__main__":

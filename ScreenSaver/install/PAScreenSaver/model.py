@@ -61,11 +61,15 @@ class Model:
     stopLog = "Stopping java proactive screensaver... \n"
     killLog = "Killing process : "
     killLogError = "Unable to kill JVM."
-    
-    def init(self):
+
+    classpath = "/../lib/tools.jar"
+
+    def init(self,jdk_path):
 	if self.MAIN_DIR[-1:] == "/":
 	    self.MAIN_DIR = self.MAIN_DIR[:-1]
 	self.writeLOG("ProActiveScreenSaver directory set as : " + self.MAIN_DIR + " at " + time.ctime() + "\n")
+        self.classpath = ".:" + jdk_path + self.classpath
+        print "classpath : " + self.classpath
 
     def launcher(self,command,user, x=0 , y=0 , java_path=''):
         log = login.Login()
@@ -99,7 +103,7 @@ class Model:
         if self.nbClient == 1:
         
 	    #launcher java part
-	    cmd = jdk_path + "/java -jar " + self.MAIN_DIR + "/FullScreenSaver.jar /tmp/ScreenSaver.bmp /tmp/dataBase.rrd "
+	    cmd = jdk_path + "/java -classpath " + self.classpath + " -jar " + self.MAIN_DIR + "/FullScreenSaver.jar /tmp/ScreenSaver.bmp /tmp/dataBase.rrd "
 	    cmd = cmd + x + " " + y
 	    print "command : " + cmd
 	    pid = Popen(cmd, shell=True).pid

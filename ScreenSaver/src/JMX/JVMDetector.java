@@ -49,8 +49,6 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
-import sun.tools.jps.Jps;
-
 import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
@@ -231,7 +229,7 @@ public class JVMDetector {
        while ((line = br.readLine()) != null) {
            String[] proc = line.split(" ");
            if(proc.length > 1){
-           	if (proc[1].equals(Jps.class.getName()) 
+           	if (proc[1].equals("sun.tools.jps.Jps")
                        || proc[1].equals(JVMDetector.class.getName()))
                        continue; // ignore jps command process and this process
            }
