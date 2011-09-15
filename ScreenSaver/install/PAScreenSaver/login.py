@@ -48,37 +48,6 @@ class Login:
     
     config_file = 'access.txt'
 
-    def checkAccess(self,username , main_dir): 
-        config = ConfigParser.RawConfigParser()
-        
-        config.read( main_dir + "/" + self.config_file )
-        items_users = config.items('USERS-ACCESS')
-        items_groups = config.items('GROUPS-ACCESS')
-
-    	right = False
-    
-    	user_groups = commands.getoutput('groups' + username)
-    	user_groups_list = user_groups.split()
-    	#Get only the group name
-    	user_groups_list = user_groups_list[2::]
-    
-    	# Tests for group name
-        for group_l in items_groups: 
-	    for group_u in user_groups_list:
-		    # user[NAME,RIGHTS]
-		    if group_l[1] == 'yes' and group_l[0] == group_u:
-		        right = True
-
-    	# Tests for user name
-    	for user_l in items_users: 
-    	    # user[NAME,RIGHTS]
-    	    if user_l[1] == 'yes' and user_l[0] == username:
-    	        right = True
-            if user_l[1] == 'no' and user_l[0] == username:
-    	        right = False
-                
-        return right
-    
     def checkSession(self,username):
         
         output = commands.getoutput( 'who -u | grep ' + username + ' | grep pts | tr -s " " | cut -d" " -f5 | tr "\n" " "' ) 

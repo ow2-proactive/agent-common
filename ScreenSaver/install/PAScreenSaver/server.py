@@ -126,17 +126,16 @@ class Server():
 
 			tab = self.data.split()
 
-			if len(tab) == 4:
+			if len(tab) == 3:
 			    self.comm = tab[0]
-			    self.username = tab[1]
-			    self.x = tab[2]
-			    self.y = tab[3]
+			    self.length = tab[1]
+			    self.width = tab[2]
 			    
 			    if self.comm == self.start :
-				self.startJVM(self.username,self.x,self.y,self.jdk_path)
+				self.startJVM(self.length,self.width,self.jdk_path)
 			    
 			    elif self.comm == self.stop:
-				self.stopJVM(self.username)
+				self.stopJVM()
 			    
 			    elif self.comm == self.shutdown:
 				self.shutDown()
@@ -145,11 +144,11 @@ class Server():
 	else:
 		print self.java_version_required
         
-    def startJVM(self , username , x , y , jdk_path):
-        self.model.launcher('startJVM' , username , x , y , jdk_path)
+    def startJVM(self , x , y , jdk_path):
+        self.model.launcher('startJVM' , x , y , jdk_path)
             
-    def stopJVM(self , username):
-        self.model.launcher('stopJVM' , username)
+    def stopJVM(self):
+        self.model.launcher('stopJVM')
         
     def shutDown(self):
         self.finish()

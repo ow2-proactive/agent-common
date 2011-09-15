@@ -34,9 +34,9 @@
  * ################################################################ 
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package Util;
+package util;
 
-import JMX.JVMData;
+import jmx.JVMData;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;

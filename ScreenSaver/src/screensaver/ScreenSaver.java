@@ -34,7 +34,7 @@
  * ################################################################ 
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package ScreenSaver;
+package screensaver;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -154,7 +154,9 @@ public class ScreenSaver {
      *           argv[3]
      */
     public static void main( String[] argv ) {
-            
+
+        System.out.println(System.getProperty("java.class.path"));
+
         if(argv.length == 4) {
 
             ScreenSaver.createBMP( 

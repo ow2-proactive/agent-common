@@ -86,7 +86,7 @@ class SSTrigger:
             #Allow proactive user to get information on the graphical session.
 	    #commands.getoutput("xhost +")
 
-            data = self.start + " " + commands.getoutput( 'whoami' ) + " " + length + " " + width
+            data = self.start + " " + length + " " + width
             
 	    pipe = open(self.pipe_path, 'w')
 	    
@@ -120,7 +120,7 @@ if len(sys.argv) == 2:
     #Screensize	
     x = screen_res[0]
     y = screen_res[1]
-    data = comm + " " + commands.getoutput( 'whoami' ) + " " + x + " " + y
+    data = comm + " " + x + " " + y
     pipe = open("/tmp/ss.pipe", 'w')
 	    
     pipe.write(data)		

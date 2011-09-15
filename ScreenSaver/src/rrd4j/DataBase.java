@@ -34,7 +34,7 @@
  * ################################################################ 
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package RRD4J;
+package rrd4j;
 
 import java.awt.image.BufferedImage;
 

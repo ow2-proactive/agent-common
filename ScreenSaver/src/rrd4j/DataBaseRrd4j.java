@@ -34,10 +34,10 @@
  * ################################################################ 
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package RRD4J;
+package rrd4j;
 
-import JMX.JVMData;
-import Util.utils;
+import jmx.JVMData;
+import util.utils;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;

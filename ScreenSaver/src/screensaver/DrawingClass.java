@@ -34,9 +34,9 @@
  * ################################################################ 
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package ScreenSaver;
+package screensaver;
 
-import JMX.ClientJMX;
+import jmx.ClientJMX;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;

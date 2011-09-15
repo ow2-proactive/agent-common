@@ -34,9 +34,9 @@
  * ################################################################ 
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package Model;
+package model;
 
-import JMX.JVMData;
+import jmx.JVMData;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import javax.management.remote.JMXConnector;

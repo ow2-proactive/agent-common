@@ -34,7 +34,7 @@
  * ################################################################ 
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package JMX;
+package jmx;
 
 import javax.management.remote.JMXConnector;
 

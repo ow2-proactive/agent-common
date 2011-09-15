@@ -10,7 +10,7 @@ if [ $USER != 'root' -a $id==0 ]; then
 fi
 
 echo "Installation of ProActive ScreenSaver...."
-echo "Path to install application : "
+echo -n "Path to install application : "
 read PROACTIVESS
 
 export PROACTIVESS=$PROACTIVESS

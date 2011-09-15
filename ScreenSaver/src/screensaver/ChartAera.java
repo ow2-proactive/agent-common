@@ -34,10 +34,10 @@
  * ################################################################ 
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package ScreenSaver;
+package screensaver;
 
-import JMX.ClientJMX;
-import RRD4J.DataBaseRrd4j;
+import jmx.ClientJMX;
+import rrd4j.DataBaseRrd4j;
 import java.awt.Color;
 import java.awt.Graphics2D;
 

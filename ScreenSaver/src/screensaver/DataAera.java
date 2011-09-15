@@ -34,9 +34,9 @@
  * ################################################################ 
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package ScreenSaver;
+package screensaver;
 
-import Model.Model;
+import model.Model;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;

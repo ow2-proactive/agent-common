@@ -34,12 +34,12 @@
  * ################################################################ 
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package JMX;
+package jmx;
 
-import Model.Model;
-import RRD4J.DataBase;
-import RRD4J.DataBaseRrd4j;
-import Util.utils;
+import model.Model;
+import rrd4j.DataBase;
+import rrd4j.DataBaseRrd4j;
+import util.utils;
 import com.sun.management.OperatingSystemMXBean;
 import java.io.BufferedReader;
 import java.io.IOException;

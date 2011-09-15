@@ -34,7 +34,7 @@
  * ################################################################ 
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package JMX;
+package jmx;
 
 import java.io.BufferedReader;
 import java.io.File;

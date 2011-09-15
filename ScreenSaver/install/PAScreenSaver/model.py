@@ -62,37 +62,32 @@ class Model:
     killLog = "Killing process : "
     killLogError = "Unable to kill JVM."
 
-    classpath = "/../lib/tools.jar"
+    classpath = "lib/rrd4j-2.0.7.jar:FullScreenSaver.jar:"
 
     def init(self,jdk_path):
 	if self.MAIN_DIR[-1:] == "/":
 	    self.MAIN_DIR = self.MAIN_DIR[:-1]
 	self.writeLOG("ProActiveScreenSaver directory set as : " + self.MAIN_DIR + " at " + time.ctime() + "\n")
-        self.classpath = ".:" + jdk_path + self.classpath
+        self.classpath = self.classpath + jdk_path + "/../lib/tools.jar"
         print "classpath : " + self.classpath
 
-    def launcher(self,command,user, x=0 , y=0 , java_path=''):
+    def launcher(self,command, x=0 , y=0 , java_path=''):
         log = login.Login()
         
-        if log.checkAccess(user , self.MAIN_DIR):
-            if command == 'startJVM':
-                #if not log.checkSession(user):
-                #    print 'access denied' 
-                #else:
-                print 'startJVM'
-                self.startJVM(user,x,y,java_path)
+        if command == 'startJVM':
+            #if not log.checkSession():
+            #    print 'access denied'
+            #else:
+            print 'startJVM'
+            self.startJVM(x,y,java_path)
+
+        if command == 'stopJVM':
+            print 'stopJVM'
+            self.stopJVM()
                 
-            if command == 'stopJVM':
-                print 'stopJVM'
-                self.stopJVM(user)
-                
-        else:
-            print 'access denied' 
-    
-        
-    def startJVM(self,user,x,y,jdk_path):
+    def startJVM(self,x,y,jdk_path):
         #log part
-        line = user + ' started JVM at : ' + time.ctime() + ' with Server/Proxy \n'
+        line = 'started JVM at : ' + time.ctime() + ' with Server/Proxy \n'
         self.writeLOG(line)
         
         self.nbClient = self.nbClient + 1
@@ -103,7 +98,7 @@ class Model:
         if self.nbClient == 1:
         
 	    #launcher java part
-	    cmd = jdk_path + "/java -classpath " + self.classpath + " -jar " + self.MAIN_DIR + "/FullScreenSaver.jar /tmp/ScreenSaver.bmp /tmp/dataBase.rrd "
+	    cmd = jdk_path + "/java -cp " + self.classpath + " screensaver.ScreenSaver /tmp/ScreenSaver.bmp /tmp/dataBase.rrd "
 	    cmd = cmd + x + " " + y
 	    print "command : " + cmd
 	    pid = Popen(cmd, shell=True).pid
@@ -112,9 +107,9 @@ class Model:
 	    
 	    self.writeLOG(self.startLog)
     
-    def stopJVM(self,user):
+    def stopJVM(self):
     	#log part
-        line = user + ' stopped JVM at : ' + time.ctime() +  ' with Server/Proxy \n'
+        line = 'stopped JVM at : ' + time.ctime() +  ' with Server/Proxy \n'
         self.writeLOG(line)
         
         self.nbClient = self.nbClient - 1
