@@ -59,9 +59,13 @@ import time
 class SSTrigger:
 	
     # FORMAT MESSAGE : [START/STOP] [USERNAME] [X] [Y]
-	
+
+    MAIN_DIR = os.environ["PROACTIVESS"]
+
     start = 'START'
     stop = 'STOP'
+
+    config_file = 'log/proxy.txt'
 
     pipe_path = "/tmp/ss.pipe"
 
@@ -72,6 +76,12 @@ class SSTrigger:
         self.bus=SessionBus()
         self.loop=MainLoop()
         self.bus.add_signal_receiver(self.catch,self.mem,self.dest)
+
+    def writeLOG(self, txt):
+    	f = open( self.MAIN_DIR + "/" + self.config_file ,'a')
+        f.write( txt )
+        f.close()
+
     def catch(self,ssOn):
         
         screen = commands.getoutput("xrandr | grep \* | tr -s ' ' | cut -d' ' -f2")
@@ -93,17 +103,19 @@ class SSTrigger:
 	    pipe.write(data)		
 	    pipe.close()
 
+            self.writeLOG(time.ctime() + "proxy has send : " + data + "\n")
 	    print "proxy has send : " + data
 
         else: #Screensaver turned off
  	    
- 	    data = self.stop + " " + commands.getoutput( 'whoami' ) + " " + length + " " + width
+ 	    data = self.stop + " " + length + " " + width
             
 	    pipe = open(self.pipe_path, 'w')
 	    
 	    pipe.write(data)		
 	    pipe.close()
 
+            self.writeLOG(time.ctime() + "proxy has send : " + data + "\n")
 	    print "proxy has send : " + data
 
 while not os.path.exists("/tmp/ss.pipe"):
@@ -127,5 +139,5 @@ if len(sys.argv) == 2:
     pipe.close()
         
 else:
-    print "Starting listenning dbus gnome-screensaver..."
+    print "Starting listening dbus gnome-screensaver..."
     SSTrigger().loop.run()

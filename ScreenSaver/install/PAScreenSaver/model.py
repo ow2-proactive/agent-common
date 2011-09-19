@@ -52,7 +52,7 @@ class Model:
     
     MAIN_DIR = os.environ["PROACTIVESS"]
 
-    config_file = 'log.txt'
+    config_file = 'log/server.txt'
     pid = 0
     
     nbClient = 0
@@ -60,13 +60,19 @@ class Model:
     startLog = "Starting java proactive screensaver... \n"
     stopLog = "Stopping java proactive screensaver... \n"
     killLog = "Killing process : "
-    killLogError = "Unable to kill JVM."
+    killLogError = "Unable to kill JVM.\n"
 
-    classpath = "lib/rrd4j-2.0.7.jar:FullScreenSaver.jar:"
+    classpath = "lib/log4j-1.2.16.jar:lib/rrd4j-2.0.7.jar:FullScreenSaver.jar:"
+    jdk_path = "tmp"
 
     def init(self,jdk_path):
 	if self.MAIN_DIR[-1:] == "/":
 	    self.MAIN_DIR = self.MAIN_DIR[:-1]
+
+        if jdk_path[-1:] == "/":
+	    jdk_path = jdk_path[:-1]
+
+        self.jdk_path = jdk_path
 	self.writeLOG("ProActiveScreenSaver directory set as : " + self.MAIN_DIR + " at " + time.ctime() + "\n")
         self.classpath = self.classpath + jdk_path + "/../lib/tools.jar"
         print "classpath : " + self.classpath
@@ -79,13 +85,13 @@ class Model:
             #    print 'access denied'
             #else:
             print 'startJVM'
-            self.startJVM(x,y,java_path)
+            self.startJVM(x,y)
 
         if command == 'stopJVM':
             print 'stopJVM'
             self.stopJVM()
                 
-    def startJVM(self,x,y,jdk_path):
+    def startJVM(self,x,y):
         #log part
         line = 'started JVM at : ' + time.ctime() + ' with Server/Proxy \n'
         self.writeLOG(line)
@@ -98,9 +104,10 @@ class Model:
         if self.nbClient == 1:
         
 	    #launcher java part
-	    cmd = jdk_path + "/java -cp " + self.classpath + " screensaver.ScreenSaver /tmp/ScreenSaver.bmp /tmp/dataBase.rrd "
-	    cmd = cmd + x + " " + y
+	    cmd = self.jdk_path + "/java -cp " + self.classpath + " screensaver.ScreenSaver /tmp/ScreenSaver.bmp /tmp/dataBase.rrd "
+	    cmd = cmd + x + " " + y + " " + self.MAIN_DIR + "/log/log4j.properties"
 	    print "command : " + cmd
+            self.writeLOG("command : " + cmd + "\n")
 	    pid = Popen(cmd, shell=True).pid
 		
 	    self.pid = (pid + 1)

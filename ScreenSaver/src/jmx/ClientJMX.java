@@ -52,10 +52,10 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.management.MBeanServerConnection;
 import javax.management.remote.JMXConnector;
+import org.apache.log4j.Logger;
+import org.apache.log4j.spi.RootLogger;
 
 /**
  *
@@ -77,6 +77,8 @@ public class ClientJMX {
     
     //Argument to check:
     String argToCheck = "-Dproactive.agent.rank=";
+
+    private final static RootLogger logger = (RootLogger) Logger.getRootLogger();
     
     /**
      * parameter constructor
@@ -147,7 +149,7 @@ public class ClientJMX {
             }
             
         } catch (IOException ex) {
-            Logger.getLogger(ClientJMX.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
         }
         
         return 0;
@@ -158,9 +160,9 @@ public class ClientJMX {
      * @param tab the tab to display
      */
     private void displayTab(String[] tab) {
-        System.out.println("\ntab : ");
+        logger.info("tab : ");
         for (String string : tab) {
-            System.out.print(string + " ");
+             logger.info(string + " ");
         }
     }
     
@@ -179,20 +181,16 @@ public class ClientJMX {
             n = n[n.length -1].split("\\.");
             
             if(n[n.length-1].equals("jar") || n[n.length-1].equals("JAR")) {
-                //System.out.println("return : " + n[n.length-2] + ".jar");
                 value = n[n.length-2] + ".jar";
             } else {
-                //System.out.println("return : " + n[n.length-1]);
                 value = n[n.length-1];
             }
             
         } else {
             n = n[0].split("\\.");
             if(n[n.length-1].equals("jar") || n[n.length-1].equals("JAR")) {
-                //System.out.println("return : " + n[n.length-2] + ".jar");
                 value =  n[n.length-2] + ".jar";
             } else {
-                //System.out.println("return : " + n[n.length-1]);
                 value =  n[n.length-1];
             }
         }
@@ -254,7 +252,7 @@ public class ClientJMX {
             JVMDb[i] =    utils.getHashCode(Model.getJVMs().get(i).getName() + " " 
                         + Model.getJVMs().get(i).getPID() + " " 
                         + Model.getJVMs().get(i).getStartTime());
-            System.out.println("JVM : " + JVMDb[i]);
+            logger.info("JVM : " + JVMDb[i]);
         }
         
         /*
@@ -289,8 +287,7 @@ public class ClientJMX {
                 Model.setHostName(InetAddress.getLocalHost().getHostName());
                 
         } catch (UnknownHostException ex) {
-            Logger.getLogger(ClientJMX.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("debug : getSystemInformations()");
+            logger.error(ex);
         }
         
         return true;
@@ -334,7 +331,6 @@ public class ClientJMX {
                         List<String> args = mBeanRuntime.getInputArguments();
                         for (String arg : args) {
                             if(arg.startsWith( argToCheck )) {
-                                System.out.println(name + " is [OK]");
                             
                                 Model.addToHeap( memBean.getHeapMemoryUsage().getUsed() );
                                 Model.addToNonHeap( memBean.getNonHeapMemoryUsage().getUsed() );
@@ -363,7 +359,7 @@ public class ClientJMX {
                 
                 return true;
             } catch (Exception ex) {
-                System.out.println( ex.getMessage() );
+                logger.error(ex);
             } 
         }
         return true;
@@ -388,16 +384,16 @@ public class ClientJMX {
                         updateJVM(index, conn, Model.getJVMs().get(index).getPID() , Model.getJVMs().get(index).getName());
                         checked = true;
                     } else {
-                        System.out.println("Broken connection detected for : " + Model.getJVMs().get(index).getName());
+                        logger.info("Broken connection detected for : " + Model.getJVMs().get(index).getName());
                         Model.removeJVMByPID(Model.getJVMs().get(index).getPID());
                     } 
                 } else {
-                    System.out.println("Broken connection detected for : " + Model.getJVMs().get(index).getName());
+                    logger.info("Broken connection detected for : " + Model.getJVMs().get(index).getName());
                     Model.removeJVMByPID(Model.getJVMs().get(index).getPID());
                 } 
                 
             } catch (IOException ex) {
-                System.out.println("Broken connection detected for : " + Model.getJVMs().get(index).getName());
+                logger.info("Broken connection detected for : " + Model.getJVMs().get(index).getName());
                 Model.removeJVMByPID(Model.getJVMs().get(index).getPID());
             }
         }
@@ -413,7 +409,7 @@ public class ClientJMX {
         
         Calendar cal = Calendar.getInstance();
         String time = cal.get(Calendar.HOUR_OF_DAY)+"h "+cal.get(Calendar.MINUTE)+"m et "+cal.get(Calendar.SECOND)+"s";
-        System.out.println(str + " : " + time);
+        logger.info(str + " : " + time);
     }
     
     /**
@@ -465,7 +461,7 @@ public class ClientJMX {
                         try {
                             jmxc.close();
                         } catch (IOException ex) {
-                            Logger.getLogger(ClientJMX.class.getName()).log(Level.SEVERE, null, ex);
+                            logger.error(ex);
                         }
                     }
                 }

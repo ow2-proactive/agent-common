@@ -40,6 +40,8 @@ import jmx.JVMData;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import javax.management.remote.JMXConnector;
+import org.apache.log4j.Logger;
+import org.apache.log4j.spi.RootLogger;
 
 /**
  *
@@ -66,6 +68,8 @@ public class Model {
      * data structure to store memory informations.
      */
     private static ArrayList<JVMData> JVMs = new ArrayList<JVMData>();
+
+    private final static RootLogger logger = (RootLogger) Logger.getRootLogger();
 
     /**
      * return CPU usage value of total JVMs scanned
@@ -163,11 +167,11 @@ public class Model {
     public static boolean addJVM(String name, int PID, long startTime, double memHeap, double memNonHeap, double cpu, JMXConnector conn) {
         
         if(Model.checkJVM(PID)) {
-            System.out.println("Exist already : " + name);
+            logger.info("Exist already : " + name);
             return false;
         }
-        
-        System.out.println("JVM added : " + name);
+
+        logger.info("JVM added : " + name);
         JVMs.add(new JVMData(name, PID, startTime , memHeap, memNonHeap, cpu, conn));
         return true;
     }
@@ -197,9 +201,7 @@ public class Model {
      * @return true if it has been found, false if not.
      */
     public static boolean checkJVM(int PID) {
-        System.out.println("check " + PID + " : ");
         for(int i = 0; i < JVMs.size() ; ++i) {
-            System.out.println("\t" + JVMs.get(i).getPID());
             if(JVMs.get(i).getPID() == PID) {
                 return true;
             }
@@ -234,9 +236,9 @@ public class Model {
      * debug method to display current JVMs.
      */
     public static void displayJVmNames() {
-        System.out.println("nb JVM : " + JVMs.size());
+        logger.info("nb JVM : " + JVMs.size());
         for (JVMData data : JVMs) {
-            System.out.println("\t" + data.getName());
+            logger.info("\t" + data.getName());
         }
     }
     

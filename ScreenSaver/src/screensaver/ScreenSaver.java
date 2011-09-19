@@ -43,11 +43,16 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Calendar;
+import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.spi.RootLogger;
 
 /**
  *
@@ -55,7 +60,8 @@ import javax.swing.ImageIcon;
  */
 
 public class ScreenSaver {
-    
+
+    private final static RootLogger logger = (RootLogger) Logger.getRootLogger();
     //ProActive picture resource
     private static URL imageURL = ScreenSaver.class.getResource("ActiveEon.png");
     private static ImageIcon icon = new ImageIcon(imageURL);
@@ -68,7 +74,7 @@ public class ScreenSaver {
      * @return The Graphics2D initialized.
      */
     public static Graphics2D init(Graphics2D g , int x , int y) {
-        
+
         g.setPaint( Color.BLACK );
         g.clearRect(0, 0, x, y);
         
@@ -100,8 +106,8 @@ public class ScreenSaver {
      * @param y Height of the screen.
      */
     public static void createBMP( String pictureFile , String dataFile, int x, int y ) {
-        
-        System.out.println("Starting screensaver..");
+
+        logger.info("Starting screensaver..");
         
         if(x > 0 && y > 0) {
             BufferedImage bitmap = new BufferedImage(x, y, BufferedImage.TYPE_3BYTE_BGR);
@@ -127,16 +133,15 @@ public class ScreenSaver {
 
                     Calendar cal = Calendar.getInstance();
                     String time = cal.get(Calendar.HOUR_OF_DAY)+"h "+cal.get(Calendar.MINUTE)+"m et "+cal.get(Calendar.SECOND)+"s";
-                    System.out.println("file created at : " + time );
                 } catch (IOException e) {
-                    System.out.println("bug during creating picture.");
+                    logger.error("bug during creating picture.");
                 }
 
             }
         } else {
-            System.out.println("Coordonate X and Y have to be positive.");
-            System.out.println("Found X: " + x + " and Y: " + y);
-            System.err.println("Exit...");
+            logger.error("Coordonate X and Y have to be positive.");
+            logger.error("Found X: " + x + " and Y: " + y);
+            logger.error("Exit...");
         }
     } 
     
@@ -152,13 +157,17 @@ public class ScreenSaver {
      *           argv[2]
      *           // Y size of screen
      *           argv[3]
+     *           // lol4j file path
+     *           argv[4]
      */
     public static void main( String[] argv ) {
 
-        System.out.println(System.getProperty("java.class.path"));
+        if(argv.length == 5) {
 
-        if(argv.length == 4) {
+            PropertyConfigurator.configure(argv[4]);
+            logger.info("main()");
 
+            logger.info("4 parameters checked [OK]");
             ScreenSaver.createBMP( 
                     // BMP file path
                     argv[0] , 

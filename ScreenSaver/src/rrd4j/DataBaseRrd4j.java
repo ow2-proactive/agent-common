@@ -45,7 +45,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
+import org.apache.log4j.spi.RootLogger;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.DsType;
 import org.rrd4j.core.DsDef;
@@ -85,6 +86,8 @@ public class DataBaseRrd4j implements DataBase {
     private long halfMinuteDuration = 30L;
     
     private long currentDuration = minute15Duration;
+
+    private final static RootLogger logger = (RootLogger) Logger.getRootLogger();
     
     /**
      * Initialize database file and ArrayList before start scanning.
@@ -113,7 +116,7 @@ public class DataBaseRrd4j implements DataBase {
                 
                 return list;
             } catch (IOException ex) {
-                Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error(ex);
             }
         }
         
@@ -166,13 +169,13 @@ public class DataBaseRrd4j implements DataBase {
         
             try {
                 RrdDb rrdDb = new RrdDb(path);
-                System.out.println("nb DataBase : " + rrdDb.getDsCount());
+                logger.info("nb DataBase : " + rrdDb.getDsCount());
                 String[] ds = rrdDb.getDsNames();
                 for (String name : ds) {
-                    System.out.println("name : " + name);
+                     logger.info("name :" + name);
                 }
             } catch (IOException ex) {
-                Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error(ex);
             }
         }
     }
@@ -192,15 +195,14 @@ public class DataBaseRrd4j implements DataBase {
             
             for (double[] ds : result) {
                 for (double d : ds) {
-                    System.out.print(d + " ");
+                    logger.info(d);
                 }
-                System.out.println();
             }
             
             rrdDb.close();
             
         } catch (IOException ex) {
-            Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
         }
     }
 
@@ -268,9 +270,9 @@ public class DataBaseRrd4j implements DataBase {
             Thread.sleep(1000);
             
         } catch (InterruptedException ex) {
-            Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
         } catch (IOException ex) {
-            Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
         }
             
         return true;
@@ -299,7 +301,7 @@ public class DataBaseRrd4j implements DataBase {
         try {
             return rrdDb.containsDs(ds);
         } catch (IOException ex) {
-            Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
         }
         return false;
     }
@@ -350,8 +352,7 @@ public class DataBaseRrd4j implements DataBase {
                     int tmp = indexOfJVMInList(rrdDb.getDatasource(i).getName());
                     
                     if(tmp != -1) {
-                        
-                        System.out.println("remove " + rrdDb.getDatasource(i).getName() + " at rank : " + tmp);
+                        logger.info("remove " + rrdDb.getDatasource(i).getName() + " at rank : " + tmp);
                         RrdToolkit.removeDatasource(path, rrdDb.getDatasource(i).getName(), false);
                         JVMDataSource.remove( tmp );
                     }
@@ -363,15 +364,15 @@ public class DataBaseRrd4j implements DataBase {
                 
                 if( !checkDsInDataBase(dbJVMs[i] , rrdDb)) {
                     
-                    System.out.println("add : " + dbJVMs[i]);
-                    
+                    logger.info("add : " + dbJVMs[i]);
+
                     DsDef def = new DsDef(dbJVMs[i], DsType.GAUGE, 5000, Double.NaN, Double.NaN);
                     RrdToolkit.addDatasource(path, def, false);
                     JVMDataSource.add( new ChartData(dbJVMs[i], getRandomColor()));
                 }
             }
         } catch (IOException ex) {
-            Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
         }
     }
     
@@ -388,7 +389,6 @@ public class DataBaseRrd4j implements DataBase {
     public boolean addValue(String path, String[] dbSystem, double[] valueSystem, String[] dbJVMs, double[] valueJVMs) {
         
         
-        checkBD(path);
         /*
          * Check datas before insert new value.
          */
@@ -409,7 +409,7 @@ public class DataBaseRrd4j implements DataBase {
                     Thread.sleep(1000);
                     time = getTime();
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.error(ex);
                 }
             }
             String val = time + "";
@@ -428,7 +428,7 @@ public class DataBaseRrd4j implements DataBase {
             rrdDb.close();
 
         } catch (IOException ex) {
-            Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
             return false;
         }
         
@@ -498,7 +498,7 @@ public class DataBaseRrd4j implements DataBase {
             
             return bi;
         } catch (IOException ex) {
-            Logger.getLogger(DataBaseRrd4j.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
         }
         return null;
     }

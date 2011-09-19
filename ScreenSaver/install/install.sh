@@ -54,6 +54,7 @@ chmod -R 700 $path
 chmod 755 $path
 chmod 755 $path/proxy.py
 chown -R proactive $path
+find $path | grep .svn | xargs rm -rf
 echo "./PAScreenSaver/ => $path [OK]"
 
 # The ProActive ScreenSaver 

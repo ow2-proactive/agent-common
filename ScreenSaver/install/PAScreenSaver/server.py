@@ -76,10 +76,6 @@ class Server():
 
     model = Model()
 
-    #JAVA MIN
-    java_version_required = "A Java version 1.6 is required at least."
-    java_version = 1
-    java_subversion = 6 
     jdk_path = ""
 
 
@@ -106,46 +102,46 @@ class Server():
         self.model.writeLOG("Checking JVM path at " + time.ctime() + "\n")
         self.checkJAVA_HOME()
 	
-	if len(self.jdk_path) > 1 :
-		self.model.writeLOG("Java founded : " + self.jdk_path + "\n")
-			
-		'''
-			IF IT'S GOOD, RUN THE LISTENNER
-		'''
-		print "Starting listenning..."
-		self.model.init(self.jdk_path)
+        self.model.writeLOG("Java founded : " + self.jdk_path + "\n")
 
-		os.chmod(self.pipe_path, stat.S_IRWXU | stat.S_IWGRP | stat.S_IWOTH)
-		pipe = open(self.pipe_path, 'r')
-		self.model.writeLOG("open pipe in read mode.\n")
-		while True:
+        #Go to proactive directory:
+        os.chdir(self.MAIN_DIR)
 
-			self.data = pipe.read()
+        '''
+                IF IT'S GOOD, RUN THE LISTENNER
+        '''
+        print "Starting listenning..."
+        self.model.init(self.jdk_path)
 
-			print "Server has received : %s" % self.data
+        os.chmod(self.pipe_path, stat.S_IRWXU | stat.S_IWGRP | stat.S_IWOTH)
+        pipe = open(self.pipe_path, 'r')
+        self.model.writeLOG("open pipe in read mode.\n")
+        while True:
 
-			tab = self.data.split()
+                self.data = pipe.read()
 
-			if len(tab) == 3:
-			    self.comm = tab[0]
-			    self.length = tab[1]
-			    self.width = tab[2]
-			    
-			    if self.comm == self.start :
-				self.startJVM(self.length,self.width,self.jdk_path)
-			    
-			    elif self.comm == self.stop:
-				self.stopJVM()
-			    
-			    elif self.comm == self.shutdown:
-				self.shutDown()
-			    
-			time.sleep(1)   
-	else:
-		print self.java_version_required
+                print "Server has received : %s" % self.data
+
+                tab = self.data.split()
+
+                if len(tab) == 3:
+                    self.comm = tab[0]
+                    self.length = tab[1]
+                    self.width = tab[2]
+
+                    if self.comm == self.start :
+                        self.startJVM(self.length,self.width)
+
+                    elif self.comm == self.stop:
+                        self.stopJVM()
+
+                    elif self.comm == self.shutdown:
+                        self.shutDown()
+
+                time.sleep(1)
         
-    def startJVM(self , x , y , jdk_path):
-        self.model.launcher('startJVM' , x , y , jdk_path)
+    def startJVM(self , x , y):
+        self.model.launcher('startJVM' , x , y )
             
     def stopJVM(self):
         self.model.launcher('stopJVM')
