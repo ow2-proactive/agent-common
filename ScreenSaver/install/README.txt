@@ -27,3 +27,7 @@ Then open $PATH/access.txt and set access policy for your users.
 Then, restart computer and enjoy it.
 
 
+---
+Copyright (C) 2007-2011 ActiveEon
+Visit http://proactive.inria.fr/ and http://www.activeeon.com/
+Contact: +33 (0)9 88 777 660, contact@activeeon.com 
