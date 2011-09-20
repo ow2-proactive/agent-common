@@ -95,7 +95,17 @@ public class ClientJMX {
         scan();
         
         Model.setJVMList( utils.synchronization(Model.getJVMs(), JVMds, dataFile) );  
+
+        if(Model.getJVMs().size() > 0) {
+            logger.info("Initialisation: ");
+            for (JVMData jvm : Model.getJVMs()) {
+                logger.info("\t" + jvm.getName());
+            }
+        } else {
+            logger.info("No one JVM found at start");
+        }
         
+
         ((DataBaseRrd4j)rrd4j).majInit(Model.getJVMs());
     }
     
@@ -246,13 +256,11 @@ public class ClientJMX {
         /**
          * Set JVM names.
          */
-        
         String[] JVMDb = new String[Model.getJVMs().size()];
         for (int i = 0; i < Model.getJVMs().size() && i < 10 ; i++) {
             JVMDb[i] =    utils.getHashCode(Model.getJVMs().get(i).getName() + " " 
                         + Model.getJVMs().get(i).getPID() + " " 
                         + Model.getJVMs().get(i).getStartTime());
-            logger.info("JVM : " + JVMDb[i]);
         }
         
         /*

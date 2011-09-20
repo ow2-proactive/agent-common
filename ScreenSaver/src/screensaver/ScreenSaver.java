@@ -43,10 +43,8 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Calendar;
-import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -107,8 +105,6 @@ public class ScreenSaver {
      */
     public static void createBMP( String pictureFile , String dataFile, int x, int y ) {
 
-        logger.info("Starting screensaver..");
-        
         if(x > 0 && y > 0) {
             BufferedImage bitmap = new BufferedImage(x, y, BufferedImage.TYPE_3BYTE_BGR);
             Graphics2D template = bitmap.createGraphics();
@@ -132,9 +128,8 @@ public class ScreenSaver {
                     ImageIO.write(bitmap, "BMP", new File( pictureFile ));
 
                     Calendar cal = Calendar.getInstance();
-                    String time = cal.get(Calendar.HOUR_OF_DAY)+"h "+cal.get(Calendar.MINUTE)+"m et "+cal.get(Calendar.SECOND)+"s";
                 } catch (IOException e) {
-                    logger.error("bug during creating picture.");
+                    logger.error("problem during creating picture.");
                 }
 
             }
@@ -165,9 +160,8 @@ public class ScreenSaver {
         if(argv.length == 5) {
 
             PropertyConfigurator.configure(argv[4]);
-            logger.info("main()");
 
-            logger.info("4 parameters checked [OK]");
+            logger.info("Start of screensaver");
             ScreenSaver.createBMP( 
                     // BMP file path
                     argv[0] , 

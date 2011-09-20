@@ -128,7 +128,7 @@ public class DataBaseRrd4j implements DataBase {
      * @param list the initialized arraylist.
      */
     public void majInit(ArrayList<JVMData> list) {
-        
+
         if(list != null) {
            for (JVMData data : list) {
                 JVMDataSource.add( new ChartData( utils.getHashCode(

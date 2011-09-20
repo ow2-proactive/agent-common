@@ -83,11 +83,11 @@ class Server():
 
     	if os.path.exists(self.pipe_path):
 		os.remove(self.pipe_path)
-		self.model.writeLOG("remove " + self.pipe_path + "\n")
+		self.model.writeLOG("remove " + self.pipe_path)
 
 	try:
     		os.mkfifo(self.pipe_path)
-    		self.model.writeLOG("create " + self.pipe_path  + "\n")
+    		self.model.writeLOG("create " + self.pipe_path)
 		
 	except OSError:
 		print "error scanned"
@@ -99,46 +99,50 @@ class Server():
         CHECK JAVA VERSION
         '''
 
-        self.model.writeLOG("Checking JVM path at " + time.ctime() + "\n")
         self.checkJAVA_HOME()
-	
-        self.model.writeLOG("Java founded : " + self.jdk_path + "\n")
 
-        #Go to proactive directory:
-        os.chdir(self.MAIN_DIR)
+        if len(self.jdk_path) < 5:
+            self.model.writeLOG("Java not found")
+            self.model.writeLOG("exit..")
 
-        '''
-                IF IT'S GOOD, RUN THE LISTENNER
-        '''
-        print "Starting listenning..."
-        self.model.init(self.jdk_path)
+        else:
 
-        os.chmod(self.pipe_path, stat.S_IRWXU | stat.S_IWGRP | stat.S_IWOTH)
-        pipe = open(self.pipe_path, 'r')
-        self.model.writeLOG("open pipe in read mode.\n")
-        while True:
+            self.model.writeLOG("Java founded : " + self.jdk_path)
 
-                self.data = pipe.read()
+            #Go to proactive directory:
+            os.chdir(self.MAIN_DIR)
 
-                print "Server has received : %s" % self.data
+            '''
+                    IF IT'S GOOD, RUN THE LISTENNER
+            '''
+            print "Starting listenning..."
+            self.model.init(self.jdk_path)
 
-                tab = self.data.split()
+            os.chmod(self.pipe_path, stat.S_IRWXU | stat.S_IWGRP | stat.S_IWOTH)
+            pipe = open(self.pipe_path, 'r')
+            while True:
 
-                if len(tab) == 3:
-                    self.comm = tab[0]
-                    self.length = tab[1]
-                    self.width = tab[2]
+                    self.data = pipe.read()
 
-                    if self.comm == self.start :
-                        self.startJVM(self.length,self.width)
+                    print "Server has received : %s" % self.data
 
-                    elif self.comm == self.stop:
-                        self.stopJVM()
+                    tab = self.data.split()
 
-                    elif self.comm == self.shutdown:
-                        self.shutDown()
+                    if len(tab) == 3:
+                        self.comm = tab[0]
+                        self.length = tab[1]
+                        self.width = tab[2]
 
-                time.sleep(1)
+                        if self.comm == self.start :
+                            self.startJVM(self.length,self.width)
+
+                        elif self.comm == self.stop:
+                            self.stopJVM()
+
+                        elif self.comm == self.shutdown:
+                            self.shutDown()
+
+                    time.sleep(1)
         
     def startJVM(self , x , y):
         self.model.launcher('startJVM' , x , y )
@@ -156,8 +160,9 @@ class Server():
         conf = config.items('SCREENSAVER-CONFIG')
 
     	jdkPath = conf[0][1]
-	print "jdk path : " + jdkPath 
-	self.jdk_path = jdkPath
+        if os.path.exists( jdkPath ):
+            print "jdk path : " + jdkPath
+            self.jdk_path = jdkPath
 
 
 if __name__ == "__main__":

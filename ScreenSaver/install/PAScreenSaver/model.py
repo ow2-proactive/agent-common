@@ -57,10 +57,10 @@ class Model:
     
     nbClient = 0
     clientLog = "Nb client(s) is now : "
-    startLog = "Starting java proactive screensaver... \n"
-    stopLog = "Stopping java proactive screensaver... \n"
+    startLog = "Starting java proactive screensaver... "
+    stopLog = "Stopping java proactive screensaver... "
     killLog = "Killing process : "
-    killLogError = "Unable to kill JVM.\n"
+    killLogError = "Unable to kill JVM."
 
     classpath = "lib/log4j-1.2.16.jar:lib/rrd4j-2.0.7.jar:FullScreenSaver.jar:"
     jdk_path = "tmp"
@@ -73,7 +73,6 @@ class Model:
 	    jdk_path = jdk_path[:-1]
 
         self.jdk_path = jdk_path
-	self.writeLOG("ProActiveScreenSaver directory set as : " + self.MAIN_DIR + " at " + time.ctime() + "\n")
         self.classpath = self.classpath + jdk_path + "/../lib/tools.jar"
         print "classpath : " + self.classpath
 
@@ -93,12 +92,12 @@ class Model:
                 
     def startJVM(self,x,y):
         #log part
-        line = 'started JVM at : ' + time.ctime() + ' with Server/Proxy \n'
+        line = 'START signal received'
         self.writeLOG(line)
         
         self.nbClient = self.nbClient + 1
         print "nb client : " + str(self.nbClient)
-        self.writeLOG(self.clientLog + str(self.nbClient) +  "\n")
+        self.writeLOG(self.clientLog + str(self.nbClient))
         
         #if it is the first client, application launch .jar
         if self.nbClient == 1:
@@ -116,14 +115,14 @@ class Model:
     
     def stopJVM(self):
     	#log part
-        line = 'stopped JVM at : ' + time.ctime() +  ' with Server/Proxy \n'
+        line = 'STOP signal received'
         self.writeLOG(line)
         
         self.nbClient = self.nbClient - 1
         if self.nbClient < 0:
         	self.nbClient = 0
         print "nb client : " + str(self.nbClient)
-        self.writeLOG(self.clientLog + str(self.nbClient) +  "\n")
+        self.writeLOG(self.clientLog + str(self.nbClient))
         
         #if it was the last client, application kill .jar
         if self.nbClient == 0:
@@ -131,7 +130,7 @@ class Model:
             	os.kill( self.pid , signal.SIGTERM)
             	print "kill : " + str(self.pid)
             
-	        self.writeLOG(self.killLog + str(self.pid) + "\n")
+	        self.writeLOG(self.killLog + str(self.pid))
 	        self.writeLOG(self.stopLog)
 	    except :
 		print "There is no process catched for : " + str(self.pid)
@@ -141,7 +140,7 @@ class Model:
        
     def writeLOG(self, txt):
     	f = open( self.MAIN_DIR + "/" + self.config_file ,'a')
-        f.write( txt )
+        f.write( time.ctime() + " : " + txt + "\n" )
         f.close() 
         
     def getPID(self):
