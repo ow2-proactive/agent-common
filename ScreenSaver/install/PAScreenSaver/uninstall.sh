@@ -2,12 +2,7 @@
 
 # author : philippe Gouttefarde
 
-if [ $USER != 'root' ]; then
-	echo "REQUIRES ROOT"
-	exit 0
-fi
-
-PROACTIVESS=`pwd`
+PROACTIVESS=/usr/bin/proactiveSS
 
 # Main directory for Pro Active ScreenSaver 
 rm -rf $PROACTIVESS

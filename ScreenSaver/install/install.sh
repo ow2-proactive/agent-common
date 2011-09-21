@@ -70,12 +70,12 @@ chown root /usr/share/applications/screensavers/ProActive.desktop
 echo "./ProActiveScreenSaver.desktop => /usr/share/applications/screensavers/ProActive.desktop [OK]"
 
 # autostart proxy at system boot for all users
-cp ./proxyPAScreenSaver.desktop /usr/share/gnome/autostart/proxyPAScreenSaver.desktop
-comm="Exec=python $path/proxy.py >> /usr/share/gnome/autostart/proxyPAScreenSaver.desktop"
-sh -c "echo $comm"
-chmod 744 /usr/share/gnome/autostart/proxyPAScreenSaver.desktop
-chown root /usr/share/gnome/autostart/proxyPAScreenSaver.desktop
-echo "./proxyPAScreenSaver.desktop => /usr/share/gnome/autostart/proxyPAScreenSaver.desktop [OK]"
+#cp ./proxyPAScreenSaver.desktop /usr/share/gnome/autostart/proxyPAScreenSaver.desktop
+#comm="Exec=python $path/proxy.py >> /usr/share/gnome/autostart/proxyPAScreenSaver.desktop"
+#sh -c "echo $comm"
+#chmod 744 /usr/share/gnome/autostart/proxyPAScreenSaver.desktop
+#chown root /usr/share/gnome/autostart/proxyPAScreenSaver.desktop
+#echo "./proxyPAScreenSaver.desktop => /usr/share/gnome/autostart/proxyPAScreenSaver.desktop [OK]"
 
 # autostart server at system boot for proactive user
 cp ./ServeurProActiveScreenSaver.sh /etc/init.d/ServeurProActiveScreenSaver

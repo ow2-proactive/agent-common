@@ -43,6 +43,8 @@ import os
 import gtk
 from gtk import gdk
 import time
+import commands
+import signal
 
 #Main class for screensaver
 #
@@ -63,7 +65,7 @@ class GsThemeWindow(gtk.Window):
 
     #initialize the xwindow to receive image
     def do_realize(self):
-        anid = self.get_anid()
+        anid = self.anid()
         if anid:
             self.window = gdk.window_foreign_new(anid)
             self.window.set_events(gdk.EXPOSURE_MASK | gdk.STRUCTURE_MASK)
@@ -91,46 +93,106 @@ class GsThemeWindow(gtk.Window):
 
     #a picture load on image
     def anim(self):
-        
+
         #check existing of file
-	while not os.path.exists(window.image_file):
-		print 'waiting for : ' + window.image_file
-		time.sleep( 0.5 ) 
+		while not os.path.exists(self.image_file):
+			print 'waiting for : ' + self.image_file
+			time.sleep( 0.5 ) 
 
         #switch image object
-        self.remove(self.image)
-        image = gtk.Image()
-        self.add(image)
-        image.show()
+		self.remove(self.image)
+		image = gtk.Image()
+		self.add(image)
+		image.show()
 
-        #check change on picture file
-	lastTime = os.stat(self.image_file)[8]
-	while lastTime <= self.lastTime:
-		if os.path.exists(self.image_file):	
-			lastTime = os.stat(self.image_file)[8]
+		#check change on picture file
+		lastTime = os.stat(self.image_file)[8]
+		while lastTime <= self.lastTime:
+			if os.path.exists(self.image_file):	
+				lastTime = os.stat(self.image_file)[8]
 		
-		time.sleep( 0.5 ) 
+			time.sleep( 0.5 ) 
 	
-        #update data
-	self.lastTime = lastTime
-	image.set_from_file( self.image_file )
+		#update data
+		self.lastTime = lastTime
+		image.set_from_file( self.image_file )
 
         #draw picture
-	self.image = image
-	self.show_all()
+		self.image = image
+		self.show_all()
 
-    #get back window anid
-    def get_anid(self):
-        id = os.environ.get('XSCREENSAVER_WINDOW')
-        return int(id, 16) if id else None
+
+
+	#get back window anid
+    def anid(self):
+
+		id = os.environ.get('XSCREENSAVER_WINDOW')
+		return int(id,16) if id else None
+
+
+
+# FORMAT MESSAGE : [START/STOP] [X] [Y]
+
+MAIN_DIR = '/usr/bin/proactive'
+
+start = 'START'
+stop = 'STOP'
+
+#log path of proxy
+config_file = 'log/proxy.txt'
+
+#named pipe path
+pipe_path = "/tmp/ss.pipe"
+
+# log method
+def writeLOG(txt):
+    f = open( MAIN_DIR + "/" + config_file ,'a')
+    f.write( txt )
+    f.close()
+
+def handler(signal, stackframe):
+
+    pipe = open(self.pipe_path, 'w')
+    
+    pipe.write(stop)		
+    pipe.close()
+
+    writeLOG(time.ctime() + "proxy has send : " + data + "\n")
+    print "screensaver has send : " + data
+
+def init():
+
+	screen = commands.getoutput("xrandr | grep \* | tr -s ' ' | cut -d' ' -f2")
+	screen_res = screen.split('x')
+    
+    #Screensize	
+	length = screen_res[0]
+	width = screen_res[1]
+
+	data = start + " " + length + " " + width
+            
+	pipe = open(pipe_path, 'w')
+	    
+	pipe.write(data)		
+	pipe.close()
+
+	writeLOG(time.ctime() + "proxy has send : " + data + "\n")
+	print "screensaver has send : " + data
 
 if __name__ == "__main__":
-    window = GsThemeWindow()
-    window.show()
+
+	#ready to send a stop to the server
+	signal.signal(signal.SIGTERM, handler)
+
+	#send start signal to the server
+	init()
+
+	window = GsThemeWindow()
+	window.show()
     
-    while True:
+	while True:
          
-        window.anim() 
-        gtk.main_iteration()
+		window.anim() 
+		gtk.main_iteration()
         
 

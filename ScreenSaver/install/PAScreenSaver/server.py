@@ -129,8 +129,8 @@ class Server():
                     tab = self.data.split()
 
                     #If ze have cought a proxy command
+	            self.comm = tab[0]
                     if len(tab) == 3:
-                        self.comm = tab[0]
                         self.length = tab[1]
                         self.width = tab[2]
 
@@ -138,9 +138,9 @@ class Server():
                         if self.comm == self.start :
                             self.startJVM(self.length,self.width)
                         
-                        #STOP
-                        elif self.comm == self.stop:
-                            self.stopJVM()
+                    #STOP
+                    elif self.comm == self.stop:
+                        self.stopJVM()
 
                     time.sleep(1)
         
