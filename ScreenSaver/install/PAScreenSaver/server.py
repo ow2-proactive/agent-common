@@ -57,30 +57,30 @@ import ConfigParser
 '''
 
 class Server():
-    """
-    The RequestHandler class for our server.
 
-    It is instantiated once per connection to the server, and must
-    override the handle() method to implement communication to the
-    client.
-    """
-    
+    #path of proactiveSS application
     MAIN_DIR = os.environ["PROACTIVESS"]
+
+    #commands
     start = 'START'
     stop = 'STOP'
-    shutdown = 'SHUTDOWN'
-    answer = 'receive message by : '
 
+    #named pipe path
     pipe_path = "/tmp/ss.pipe"
+
+    #log path of jdk
     config_file = 'config.txt'
 
+    #Model instance
     model = Model()
 
+    #JDK path
     jdk_path = ""
 
-
+    #listen loop of named pipe
     def listen(self):
 
+        #clean pipe existing
     	if os.path.exists(self.pipe_path):
 		os.remove(self.pipe_path)
 		self.model.writeLOG("remove " + self.pipe_path)
@@ -95,16 +95,14 @@ class Server():
 
         print "Server start to listen the proxys"
         
-        '''
-        CHECK JAVA VERSION
-        '''
-
+        #Check jdk path
         self.checkJAVA_HOME()
 
         if len(self.jdk_path) < 5:
             self.model.writeLOG("Java not found")
             self.model.writeLOG("exit..")
 
+        #If jdk path is correct, start listen loop
         else:
 
             self.model.writeLOG("Java founded : " + self.jdk_path)
@@ -120,6 +118,8 @@ class Server():
 
             os.chmod(self.pipe_path, stat.S_IRWXU | stat.S_IWGRP | stat.S_IWOTH)
             pipe = open(self.pipe_path, 'r')
+            
+            #loop of listenning
             while True:
 
                     self.data = pipe.read()
@@ -128,31 +128,31 @@ class Server():
 
                     tab = self.data.split()
 
+                    #If ze have cought a proxy command
                     if len(tab) == 3:
                         self.comm = tab[0]
                         self.length = tab[1]
                         self.width = tab[2]
 
+                        #START
                         if self.comm == self.start :
                             self.startJVM(self.length,self.width)
-
+                        
+                        #STOP
                         elif self.comm == self.stop:
                             self.stopJVM()
 
-                        elif self.comm == self.shutdown:
-                            self.shutDown()
-
                     time.sleep(1)
         
+    #start method
     def startJVM(self , x , y):
         self.model.launcher('startJVM' , x , y )
-            
+          
+    #stop method
     def stopJVM(self):
         self.model.launcher('stopJVM')
-        
-    def shutDown(self):
-        self.finish()
-        
+      
+    #check jdkHome in config file
     def checkJAVA_HOME(self): 
         config = ConfigParser.RawConfigParser()
         
@@ -170,6 +170,8 @@ if __name__ == "__main__":
     main_dir = os.environ["PROACTIVESS"]
     file_name = main_dir + "/resource/pid.tmp"
 
+
+    #check clean and start argument
     if len(sys.argv) == 2:
         comm = sys.argv[1]
         print "command : " + comm

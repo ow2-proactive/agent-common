@@ -50,54 +50,75 @@ import time
 # The model of the Daemon, contain all functions.
 class Model:
     
+    #path of proactiveSS application 
     MAIN_DIR = os.environ["PROACTIVESS"]
 
+    #log path of server
     config_file = 'log/server.txt'
+
+    #Current PID of screensaver.jar if it executed
     pid = 0
     
+    #Current number of client
     nbClient = 0
+
+    #log sentences..
     clientLog = "Nb client(s) is now : "
     startLog = "Starting java proactive screensaver... "
     stopLog = "Stopping java proactive screensaver... "
     killLog = "Killing process : "
     killLogError = "Unable to kill JVM."
 
+    #classpath of java execution
     classpath = "lib/log4j-1.2.16.jar:lib/rrd4j-2.0.7.jar:FullScreenSaver.jar:"
     jdk_path = "tmp"
 
+    # initialize jdk path and main directory path
     def init(self,jdk_path):
+
+        # MAIN DIR PATH
 	if self.MAIN_DIR[-1:] == "/":
 	    self.MAIN_DIR = self.MAIN_DIR[:-1]
 
+        # JDK PATH
         if jdk_path[-1:] == "/":
 	    jdk_path = jdk_path[:-1]
 
         self.jdk_path = jdk_path
         self.classpath = self.classpath + jdk_path + "/../lib/tools.jar"
-        print "classpath : " + self.classpath
 
+    # main method.
+    # 
+    #   receive command from server.py
+    #       startJVM:
+    #                   - Add a client to the counter
+    #                   - If it is the first, launch java application
+    #
+    #       stopJVM:
+    #                   - Sub a client to the counter
+    #                   - If it was the last, shutdown java application
+    #
     def launcher(self,command, x=0 , y=0 , java_path=''):
-        log = login.Login()
         
         if command == 'startJVM':
-            #if not log.checkSession():
-            #    print 'access denied'
-            #else:
-            print 'startJVM'
             self.startJVM(x,y)
 
         if command == 'stopJVM':
-            print 'stopJVM'
             self.stopJVM()
-                
+        
+    # The start Java method
     def startJVM(self,x,y):
+        
         #log part
         line = 'START signal received'
         self.writeLOG(line)
-        
+        #***********************************
+
+        #Clients counter manager
         self.nbClient = self.nbClient + 1
         print "nb client : " + str(self.nbClient)
         self.writeLOG(self.clientLog + str(self.nbClient))
+        #***********************************
         
         #if it is the first client, application launch .jar
         if self.nbClient == 1:
@@ -109,20 +130,27 @@ class Model:
             self.writeLOG("command : " + cmd + "\n")
 	    pid = Popen(cmd, shell=True).pid
 		
+            #get back PID of java process
 	    self.pid = (pid + 1)
 	    
 	    self.writeLOG(self.startLog)
+        #***********************************
     
+    # The stop Java method
     def stopJVM(self):
-    	#log part
+    	
+        #log part
         line = 'STOP signal received'
         self.writeLOG(line)
+        #***********************************
         
+        #Clients counter manager
         self.nbClient = self.nbClient - 1
         if self.nbClient < 0:
         	self.nbClient = 0
         print "nb client : " + str(self.nbClient)
         self.writeLOG(self.clientLog + str(self.nbClient))
+        #***********************************
         
         #if it was the last client, application kill .jar
         if self.nbClient == 0:
@@ -135,15 +163,13 @@ class Model:
 	    except :
 		print "There is no process catched for : " + str(self.pid)
                 self.writeLOG(self.killLogError)
-		
+	#***********************************
             
        
+    # log method
     def writeLOG(self, txt):
     	f = open( self.MAIN_DIR + "/" + self.config_file ,'a')
         f.write( time.ctime() + " : " + txt + "\n" )
         f.close() 
-        
-    def getPID(self):
-        print "PID : " + str(self.pid)
     
     

@@ -58,17 +58,20 @@ import time
 
 class SSTrigger:
 	
-    # FORMAT MESSAGE : [START/STOP] [USERNAME] [X] [Y]
+    # FORMAT MESSAGE : [START/STOP] [X] [Y]
 
     MAIN_DIR = os.environ["PROACTIVESS"]
 
     start = 'START'
     stop = 'STOP'
 
+    #log path of proxy
     config_file = 'log/proxy.txt'
 
+    #named pipe path
     pipe_path = "/tmp/ss.pipe"
 
+    #Initialize dbus
     def __init__(self):
         DBusGMainLoop(set_as_default=True)
         self.mem='ActiveChanged'
@@ -77,11 +80,13 @@ class SSTrigger:
         self.loop=MainLoop()
         self.bus.add_signal_receiver(self.catch,self.mem,self.dest)
 
+    # log method
     def writeLOG(self, txt):
     	f = open( self.MAIN_DIR + "/" + self.config_file ,'a')
         f.write( txt )
         f.close()
 
+    # receive signal and write message on dbus
     def catch(self,ssOn):
         
         screen = commands.getoutput("xrandr | grep \* | tr -s ' ' | cut -d' ' -f2")
@@ -118,10 +123,12 @@ class SSTrigger:
             self.writeLOG(time.ctime() + "proxy has send : " + data + "\n")
 	    print "proxy has send : " + data
 
+#Wait server init the process
 while not os.path.exists("/tmp/ss.pipe"):
     print "wait...\n"
     time.sleep( 1 )
 
+#debug param ( START or STOP )
 if len(sys.argv) == 2:
     comm = sys.argv[1]
     print comm
@@ -137,7 +144,8 @@ if len(sys.argv) == 2:
 	    
     pipe.write(data)		
     pipe.close()
-        
+
+# Basic application start       
 else:
     print "Starting listening dbus gnome-screensaver..."
     SSTrigger().loop.run()
