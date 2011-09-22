@@ -68,6 +68,7 @@ class Model:
     stopLog = "Stopping java proactive screensaver... "
     killLog = "Killing process : "
     killLogError = "Unable to kill JVM."
+    javaLogError = "Impossible to run Java command, bad syntax."
 
     #classpath of java execution
     classpath = "lib/log4j-1.2.16.jar:lib/rrd4j-2.0.7.jar:FullScreenSaver.jar:"
@@ -127,13 +128,18 @@ class Model:
 	    cmd = self.jdk_path + "/java -cp " + self.classpath + " screensaver.ScreenSaver /tmp/ScreenSaver.bmp /tmp/dataBase.rrd "
 	    cmd = cmd + x + " " + y + " " + self.MAIN_DIR + "/log/log4j.properties"
 	    print "command : " + cmd
-            self.writeLOG("command : " + cmd + "\n")
-	    pid = Popen(cmd, shell=True).pid
-		
-            #get back PID of java process
-	    self.pid = (pid + 1)
+        self.writeLOG("command : " + cmd)
 	    
-	    self.writeLOG(self.startLog)
+        try:
+            pid = Popen(cmd, shell=True).pid
+            #get back PID of java process
+            self.pid = (pid + 1)
+	        
+            self.writeLOG(self.startLog)
+
+        except OSError:
+            print self.javaLogError
+            self.writeLOG(self.javaLogError)
         #***********************************
     
     # The stop Java method
@@ -155,14 +161,14 @@ class Model:
         #if it was the last client, application kill .jar
         if self.nbClient == 0:
 	    try :
-            	os.kill( self.pid , signal.SIGTERM)
-            	print "kill : " + str(self.pid)
+        	os.kill( self.pid , signal.SIGTERM)
+        	print "kill : " + str(self.pid)
             
-	        self.writeLOG(self.killLog + str(self.pid))
-	        self.writeLOG(self.stopLog)
+        	self.writeLOG(self.killLog + str(self.pid))
+        	self.writeLOG(self.stopLog)
 	    except :
-		print "There is no process catched for : " + str(self.pid)
-                self.writeLOG(self.killLogError)
+		    print "There is no process catched for : " + str(self.pid)
+            self.writeLOG(self.killLogError)
 	#***********************************
             
        

@@ -45,6 +45,7 @@ from gtk import gdk
 import time
 import commands
 import signal
+import sys
 
 #Main class for screensaver
 #
@@ -152,13 +153,14 @@ def writeLOG(txt):
 
 def handler(signal, stackframe):
 
-    pipe = open(self.pipe_path, 'w')
-    
-    pipe.write(stop)		
-    pipe.close()
-
-    writeLOG(time.ctime() + "proxy has send : " + data + "\n")
-    print "screensaver has send : " + data
+	pipe = open(pipe_path, 'w')
+	
+	pipe.write(stop)		
+	pipe.close()
+	
+	#writeLOG(time.ctime() + "proxy has send : " + stop + "\n")
+	print "screensaver has send : " + stop
+	sys.exit()
 
 def init():
 
@@ -176,7 +178,7 @@ def init():
 	pipe.write(data)		
 	pipe.close()
 
-	writeLOG(time.ctime() + "proxy has send : " + data + "\n")
+	#writeLOG(time.ctime() + "proxy has send : " + data + "\n")
 	print "screensaver has send : " + data
 
 if __name__ == "__main__":

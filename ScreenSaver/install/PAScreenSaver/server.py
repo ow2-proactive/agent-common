@@ -71,6 +71,9 @@ class Server():
     #log path of jdk
     config_file = 'config.txt'
 
+    #log sentence
+    error_pipe = 'Impossible to create a named pipe.'
+
     #Model instance
     model = Model()
 
@@ -81,17 +84,17 @@ class Server():
     def listen(self):
 
         #clean pipe existing
-    	if os.path.exists(self.pipe_path):
-		os.remove(self.pipe_path)
-		self.model.writeLOG("remove " + self.pipe_path)
+        if os.path.exists(self.pipe_path):
+            os.remove(self.pipe_path)
+            self.model.writeLOG("remove " + self.pipe_path)
 
-	try:
-    		os.mkfifo(self.pipe_path)
-    		self.model.writeLOG("create " + self.pipe_path)
+        try:
+            os.mkfifo(self.pipe_path)
+            self.model.writeLOG("create " + self.pipe_path)
 		
-	except OSError:
-		print "error scanned"
-    		pass
+        except OSError:
+            print "error scanned"
+            self.model.writeLOG(self.error_pipe)
 
         print "Server start to listen the proxys"
         
@@ -100,7 +103,7 @@ class Server():
 
         if len(self.jdk_path) < 5:
             self.model.writeLOG("Java not found")
-            self.model.writeLOG("exit..")
+            self.model.writeLOG("Exit..")
 
         #If jdk path is correct, start listen loop
         else:
@@ -122,27 +125,34 @@ class Server():
             #loop of listenning
             while True:
 
-                    self.data = pipe.read()
+					self.data = pipe.read()
 
-                    print "Server has received : %s" % self.data
+					print "Server has received : %s" % self.data
 
-                    tab = self.data.split()
+					tab = self.data.split()
 
-                    #If ze have cought a proxy command
-	            self.comm = tab[0]
-                    if len(tab) == 3:
-                        self.length = tab[1]
-                        self.width = tab[2]
+					#If ze have cought a proxy command
+                    
+                    
+					if len(tab) == 3:
+						self.comm = tab[0]
+   						self.length = tab[1]
+						self.width = tab[2]
 
-                        #START
-                        if self.comm == self.start :
-                            self.startJVM(self.length,self.width)
+						#START
+						if self.comm == self.start :
+							self.startJVM(self.length,self.width)
                         
-                    #STOP
-                    elif self.comm == self.stop:
-                        self.stopJVM()
+                    
+					if len(tab) == 1:
 
-                    time.sleep(1)
+						self.comm = tab[0]
+
+						#STOP
+						if self.comm == self.stop:
+							self.stopJVM()
+
+					time.sleep(1)
         
     #start method
     def startJVM(self , x , y):

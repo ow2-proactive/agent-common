@@ -98,30 +98,27 @@ class SSTrigger:
         
         if ssOn == 1: #Screensaver turned on
 
-            #Allow proactive user to get information on the graphical session.
-	    #commands.getoutput("xhost +")
-
             data = self.start + " " + length + " " + width
             
-	    pipe = open(self.pipe_path, 'w')
+            pipe = open(self.pipe_path, 'w')
 	    
-	    pipe.write(data)		
-	    pipe.close()
+            pipe.write(data)		
+            pipe.close()
 
             self.writeLOG(time.ctime() + "proxy has send : " + data + "\n")
-	    print "proxy has send : " + data
+            print "proxy has send : " + data
 
         else: #Screensaver turned off
  	    
- 	    data = self.stop + " " + length + " " + width
+            data = self.stop + " " + length + " " + width
             
-	    pipe = open(self.pipe_path, 'w')
+            pipe = open(self.pipe_path, 'w')
 	    
-	    pipe.write(data)		
-	    pipe.close()
+            pipe.write(data)		
+            pipe.close()
 
             self.writeLOG(time.ctime() + "proxy has send : " + data + "\n")
-	    print "proxy has send : " + data
+            print "proxy has send : " + data
 
 #Wait server init the process
 while not os.path.exists("/tmp/ss.pipe"):
