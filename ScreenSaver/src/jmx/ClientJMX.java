@@ -284,7 +284,7 @@ public class ClientJMX {
                 if (mem == 0) {
                     return false;
                 }
-                
+
                 Model.setFreeMemory(Model.getTotalMemory() - mem);
                 Model.setTotalSwap(mxbean.getTotalSwapSpaceSize() / (1024*1024));
                 Model.setFreeSwap(mxbean.getFreeSwapSpaceSize() / (1024*1024));

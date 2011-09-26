@@ -71,7 +71,7 @@ class Model:
     javaLogError = "Impossible to run Java command, bad syntax."
 
     #classpath of java execution
-    classpath = "lib/log4j-1.2.16.jar:lib/rrd4j-2.0.7.jar:FullScreenSaver.jar:"
+    classpath = "lib/log4j-1.2.16.jar:lib/rrd4j-2.0.7.jar:ScreenSaver.jar:"
     jdk_path = "tmp"
 
     # initialize jdk path and main directory path
@@ -125,8 +125,8 @@ class Model:
         if self.nbClient == 1:
         
 	    #launcher java part
-	    cmd = self.jdk_path + "/java -cp " + self.classpath + " screensaver.ScreenSaver /tmp/ScreenSaver.bmp /tmp/dataBase.rrd "
-	    cmd = cmd + x + " " + y + " " + self.MAIN_DIR + "/log/log4j.properties"
+	    cmd = self.jdk_path + "/java -cp " + self.classpath + " screensaver.ScreenSaver /tmp/ScreenSaver.bmp "
+	    cmd = cmd + self.MAIN_DIR + "/database.rrd " + x + " " + y + " " + self.MAIN_DIR + "/log/log4j.properties"
 	    print "command : " + cmd
         self.writeLOG("command : " + cmd)
 	    

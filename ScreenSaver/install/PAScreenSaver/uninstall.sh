@@ -2,7 +2,7 @@
 
 # author : philippe Gouttefarde
 
-PROACTIVESS=/usr/bin/proactiveSS
+PROACTIVESS=/usr/bin/ProActiveScreenSaver
 
 # Main directory for Pro Active ScreenSaver 
 rm -rf $PROACTIVESS
@@ -17,8 +17,8 @@ rm /usr/share/applications/screensavers/ProActive.desktop
 echo "remove /usr/share/applications/screensavers/ProActive.desktop file [OK]"
 
 # autostart proxy at system boot for all users
-rm /usr/share/gnome/autostart/proxyPAScreenSaver.desktop
-echo "remove /usr/share/gnome/autostart/proxyPAScreenSaver.desktop file [OK]"
+#rm /usr/share/gnome/autostart/proxyPAScreenSaver.desktop
+#echo "remove /usr/share/gnome/autostart/proxyPAScreenSaver.desktop file [OK]"
 
 # autostart server at system boot for proactive user
 update-rc.d -f ServeurProActiveScreenSaver remove

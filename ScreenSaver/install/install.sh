@@ -10,16 +10,7 @@ if [ $USER != 'root' -a $id==0 ]; then
 fi
 
 echo "Installation of ProActive ScreenSaver...."
-echo -n "Path to install application : "
-read PROACTIVESS
-
-export PROACTIVESS=$PROACTIVESS
-
-#Check variable envirronement PROACTIVESS
-if [ -z "$PROACTIVESS" ]; then
-	echo "please set PROACTIVESS in your environment variables."
-	exit 1
-fi
+PROACTIVESS=/usr/bin/ProActiveScreenSaver
 
 #Check is proactive user exists
 if [ -z $(getent passwd proactive) ]; then
