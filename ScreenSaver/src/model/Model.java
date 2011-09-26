@@ -123,7 +123,14 @@ public class Model {
         Model.cpuBefore = cpuBefore;
     }
 
-    
+    /**
+     * getter of current memory usage
+     * @return current memory usage
+     */
+    static public double getMemoryUsage() {
+        return (100*(totalMemory-freeMemory))/totalMemory;
+    }
+
     /**
      * return the total memory of each JVM in a tab for the rrd4j database.
      * @return the total memory of each JVM in a tab for the rrd4j database.

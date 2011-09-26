@@ -245,13 +245,15 @@ public class ClientJMX {
             RAM = 0;
         }
         
-        String[] systemDb = new String[2];
+        String[] systemDb = new String[3];
         systemDb[0] = "JVMs Memory usage";
         systemDb[1] = "JVMs CPU usage";
+        systemDb[2] = "System Memory usage";
         
-        double[] systemValue = new double[2];
+        double[] systemValue = new double[3];
         systemValue[0] = RAM;
         systemValue[1] = CPU;
+        systemValue[2] = Model.getMemoryUsage();
         
         /**
          * Set JVM names.

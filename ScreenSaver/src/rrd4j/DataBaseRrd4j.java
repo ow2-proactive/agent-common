@@ -44,7 +44,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.RootLogger;
 import org.rrd4j.ConsolFun;
@@ -67,25 +66,30 @@ public class DataBaseRrd4j implements DataBase {
 
     public int SYSTEM = 0;
     public int JVM = 1;
+
+    private int nbSystemData = 3;
     
     private String path;
     private ArrayList<ChartData> systemDataSource = new ArrayList<ChartData>();
     private ArrayList<ChartData> JVMDataSource = new ArrayList<ChartData>();
-    
+
+    private Color[] colortab = new Color[nbSystemData];
+
     private Random random = new Random();
     private String graphPath = "/tmp/tmp.gif";
-    private String comment = "ProActive screensaver using rrd4J" ;
+    private String comment = " < ProActive >";
     private long startTime = 0L;
     private long endTime;
     private int height;
     private int width;
     private long weekDuration = 604800L;
-    private long halfHour = 1800L;
+    private long dayDuration = 86400L;
+    private long sixHour = 21600;
     private long minute15Duration = 900L;
     private long minuteDuration = 60L;
     private long halfMinuteDuration = 30L;
     
-    private long currentDuration = minute15Duration;
+    private long currentDuration = sixHour;
 
     private final static RootLogger logger = (RootLogger) Logger.getRootLogger();
     
@@ -97,7 +101,11 @@ public class DataBaseRrd4j implements DataBase {
     public ArrayList<String> init(String path) {
         
         this.path = path;
-        
+
+        colortab[0] = new Color(28, 40, 82);
+        colortab[1] = new Color(211, 127, 57);
+        colortab[2] = new Color(176, 220, 159);
+
         if(new File(path).exists()) {
             
             ArrayList<String> list = new ArrayList<String>();
@@ -106,11 +114,11 @@ public class DataBaseRrd4j implements DataBase {
                 RrdDb rrdDb = new RrdDb(path);
                 String[] ds = rrdDb.getDsNames();
                 int i;
-                for (i=0 ; i < 2 ; ++i) {
-                        systemDataSource.add( new ChartData(ds[i], getRandomColor() ));
+                for (i=0 ; i < nbSystemData ; ++i) {
+                        systemDataSource.add( new ChartData(ds[i], colortab[i] ));
                 }
                 
-                for (i=2 ; i < ds.length ; ++i) {
+                for (i=nbSystemData ; i < ds.length ; ++i) {
                         list.add( ds[i] );
                 }
                 
@@ -242,6 +250,7 @@ public class DataBaseRrd4j implements DataBase {
      * @param dbNameJVM array of data source name for JVM informations.
      * @return true if all is good, false if not.
      */
+    @Override
     public boolean createDB(String path, String[] dbNameSystem, String[] dbNameJVM) {
         
         this.path = path;
@@ -255,7 +264,7 @@ public class DataBaseRrd4j implements DataBase {
             rrdDef.addArchive(ConsolFun.TOTAL, 0.2, 1, 5000);
 
             for(int i = 0 ; i < dbNameSystem.length ; ++i) {
-                systemDataSource.add( new ChartData(dbNameSystem[i], getRandomColor()));
+                systemDataSource.add( new ChartData(dbNameSystem[i], colortab[i]));
                 rrdDef.addDatasource(dbNameSystem[i], DsType.GAUGE, 5000, Double.NaN, Double.NaN);
             }
             for(int i = 0 ; i < dbNameJVM.length ; ++i) {
@@ -347,7 +356,7 @@ public class DataBaseRrd4j implements DataBase {
             RrdDb rrdDb = new RrdDb(path);
             
             //Check the JVM to delete in database.
-            for (int i = 2; i < rrdDb.getDsCount(); i++) {
+            for (int i = nbSystemData; i < rrdDb.getDsCount(); i++) {
                 if(!checkDsInTab(rrdDb.getDatasource(i).getName(), dbJVMs)) {
                     int tmp = indexOfJVMInList(rrdDb.getDatasource(i).getName());
                     
@@ -386,8 +395,8 @@ public class DataBaseRrd4j implements DataBase {
      * @param valueJVMs array of JVM values.
      * @return true if all is good, false if not.
      */
+    @Override
     public boolean addValue(String path, String[] dbSystem, double[] valueSystem, String[] dbJVMs, double[] valueJVMs) {
-        
         
         /*
          * Check datas before insert new value.
@@ -442,6 +451,7 @@ public class DataBaseRrd4j implements DataBase {
      * @param title The title of the chart.
      * @return a BufferedImage containing the graph. 
      */
+    @Override
     public BufferedImage createGraphic(int type , String title) {
         
         try{
@@ -480,10 +490,10 @@ public class DataBaseRrd4j implements DataBase {
             
             graphDef.setMinValue(0);
             graphDef.setVerticalLabel("percent %");
+            graphDef.comment( comment );
             graphDef.setAltYGrid(true);
             graphDef.setAntiAliasing(true);
             graphDef.setForceRulesLegend(true);
-            graphDef.comment(comment);
             graphDef.setNoMinorGrid(true);
             graphDef.setShowSignature(false);
             
@@ -497,7 +507,7 @@ public class DataBaseRrd4j implements DataBase {
             graph.render(bi.getGraphics());
             
             return bi;
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             logger.error(ex);
         }
         return null;
