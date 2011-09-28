@@ -59,7 +59,7 @@ import ConfigParser
 class Server():
 
     #path of proactiveSS application
-    MAIN_DIR = os.environ["PROACTIVESS"]
+    MAIN_DIR = "/usr/bin/ProActiveScreenSaver"
 
     #commands
     start = 'START'

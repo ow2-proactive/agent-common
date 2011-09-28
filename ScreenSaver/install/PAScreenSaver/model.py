@@ -1,4 +1,3 @@
-#!/usr/bin/env python
   
 #
 # ################################################################
@@ -39,7 +38,6 @@
 
 # author : philippe Gouttefarde
 
-import login
 import commands
 import os
 from subprocess import Popen
@@ -51,7 +49,7 @@ import time
 class Model:
     
     #path of proactiveSS application 
-    MAIN_DIR = os.environ["PROACTIVESS"]
+    MAIN_DIR = "/usr/bin/ProActiveScreenSaver"
 
     #log path of server
     config_file = 'log/server.txt'

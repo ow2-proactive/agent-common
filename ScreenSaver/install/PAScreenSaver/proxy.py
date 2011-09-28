@@ -60,7 +60,7 @@ class SSTrigger:
 	
     # FORMAT MESSAGE : [START/STOP] [X] [Y]
 
-    MAIN_DIR = os.environ["PROACTIVESS"]
+    MAIN_DIR = "/usr/bin/ProActiveScreenSaver"
 
     start = 'START'
     stop = 'STOP'

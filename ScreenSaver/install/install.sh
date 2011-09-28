@@ -2,15 +2,13 @@
 
 # author : philippe Gouttefarde
 
-id=`id -u`
+echo "Installation of ProActive ScreenSaver...."
 
+id=`id -u`
 if [ $USER != 'root' -a $id==0 ]; then
 	echo "REQUIRES ROOT"
 	exit 0
 fi
-
-echo "Installation of ProActive ScreenSaver...."
-PROACTIVESS=/usr/bin/ProActiveScreenSaver
 
 #Check is proactive user exists
 if [ -z $(getent passwd proactive) ]; then
@@ -21,62 +19,93 @@ else
  	echo "Check proactive user [OK]"
 fi
 
-path="null"
-
-if [ "${PROACTIVESS: (-1)}" == "/" ]; then
-	
-	len=${#PROACTIVESS}
-	path=${PROACTIVESS:0:$len-1}
-else
-	path=$PROACTIVESS
-fi
+path=/usr/bin/ProActiveScreenSaver
 
 echo "PROACTIVESS is set as : $path"
 
-# environnement variable for $PROACTIVESS
-comm="PROACTIVESS=\"$path\" >> /etc/environment"
-sh -c "echo $comm"
-echo "add PROACTIVESS=\"$path\" at the end of /etc/environment [OK]"
+#Get linux distribution
+tmp=`cat /etc/*-release`
+distrib=`echo $tmp | grep Ubuntu`
 
-# Main directory for Pro Active ScreenSaver 
-mkdir $path
-cp -r ./PAScreenSaver/* ${path}/
-chmod -R 700 $path
-chmod 755 $path
-chmod 755 $path/proxy.py
-chown -R proactive $path
-find $path | grep .svn | xargs rm -rf
-echo "./PAScreenSaver/ => $path [OK]"
+if [ $(echo ${#distrib}) -gt 1 ]
+then
+	echo "Ubuntu distribution detected."
 
-# The ProActive ScreenSaver 
-cp ./ProActiveScreenSaver /usr/lib/xscreensaver/ProActive
-chmod 755 /usr/lib/xscreensaver/ProActive
-chown root /usr/lib/xscreensaver/ProActive
-echo "./ProActiveScreenSaver => /usr/lib/xscreensaver/ProActive [OK]"
+	# Main directory for Pro Active ScreenSaver 
+	mkdir $path
+	cp -r ./PAScreenSaver/* ${path}/
+	chmod -R 700 $path
+	chmod 755 $path
+	chmod 755 $path/proxy.py
+	chown -R proactive $path
+	find $path | grep .svn | xargs rm -rf
+	echo "./PAScreenSaver/ => $path [OK]"
 
-# The ProActive ScreenSaver  .desktop
-cp ./ProActiveScreenSaver.desktop /usr/share/applications/screensavers/ProActive.desktop
-chmod 755 /usr/share/applications/screensavers/ProActive.desktop
-chown root /usr/share/applications/screensavers/ProActive.desktop
-echo "./ProActiveScreenSaver.desktop => /usr/share/applications/screensavers/ProActive.desktop [OK]"
+	# The ProActive ScreenSaver 
+	cp ./ProActiveScreenSaver /usr/lib/xscreensaver/ProActive
+	chmod 755 /usr/lib/xscreensaver/ProActive
+	chown root /usr/lib/xscreensaver/ProActive
+	echo "./ProActiveScreenSaver => /usr/lib/xscreensaver/ProActive [OK]"
 
-# autostart proxy at system boot for all users
-#cp ./proxyPAScreenSaver.desktop /usr/share/gnome/autostart/proxyPAScreenSaver.desktop
-#comm="Exec=python $path/proxy.py >> /usr/share/gnome/autostart/proxyPAScreenSaver.desktop"
-#sh -c "echo $comm"
-#chmod 744 /usr/share/gnome/autostart/proxyPAScreenSaver.desktop
-#chown root /usr/share/gnome/autostart/proxyPAScreenSaver.desktop
-#echo "./proxyPAScreenSaver.desktop => /usr/share/gnome/autostart/proxyPAScreenSaver.desktop [OK]"
+	# The ProActive ScreenSaver  .desktop
+	cp ./ProActiveScreenSaver.desktop /usr/share/applications/screensavers/ProActive.desktop
+	chmod 755 /usr/share/applications/screensavers/ProActive.desktop
+	chown root /usr/share/applications/screensavers/ProActive.desktop
+	echo "./ProActiveScreenSaver.desktop => /usr/share/applications/screensavers/ProActive.desktop [OK]"
 
-# autostart server at system boot for proactive user
-cp ./ServeurProActiveScreenSaver.sh /etc/init.d/ServeurProActiveScreenSaver
-comm="su proactive -c \'python $path/server.py clean\' >> /etc/init.d/ServeurProActiveScreenSaver"
-sh -c "echo $comm"
-comm="su proactive -c \'python $path/server.py start \&\' >> /etc/init.d/ServeurProActiveScreenSaver"
-sh -c "echo $comm"
-update-rc.d ServeurProActiveScreenSaver defaults
-chmod +x /etc/init.d/ServeurProActiveScreenSaver
-echo "./ServeurProActiveScreenSaver.sh => /etc/init.d/ServeurProActiveScreenSaver [OK]"
+	# autostart server at system boot for proactive user
+	cp ./ServeurProActiveScreenSaver.sh /etc/init.d/ServeurProActiveScreenSaver
+	comm="su proactive -c \'python $path/server.py clean\' >> /etc/init.d/ServeurProActiveScreenSaver"
+	sh -c "echo $comm"
+	comm="su proactive -c \'python $path/server.py start \&\' >> /etc/init.d/ServeurProActiveScreenSaver"
+	sh -c "echo $comm"
+	update-rc.d ServeurProActiveScreenSaver defaults
+	chmod +x /etc/init.d/ServeurProActiveScreenSaver
+	echo "./ServeurProActiveScreenSaver.sh => /etc/init.d/ServerProActiveScreenSaver [OK]"
+
+else
+	distrib=`echo $tmp | grep Fedora`
+
+	if [ $(echo ${#distrib}) -gt 1 ]
+	then
+		echo "Fedora distribution detected."
+
+		# environnement variable for $PROACTIVESS
+		comm="PROACTIVESS=\"$path\" >> /etc/environment"
+		sh -c "echo $comm"
+		echo "add PROACTIVESS=\"$path\" at the end of /etc/environment [OK]"
+
+		# Main directory for Pro Active ScreenSaver 
+		mkdir $path
+		cp -r ./PAScreenSaver/* ${path}/
+		chmod -R 700 $path
+		chmod 755 $path
+		chmod 755 $path/proxy.py
+		chown -R proactive $path
+		find $path | grep .svn | xargs rm -rf
+		echo "./PAScreenSaver/ => $path [OK]"
+
+		# The ProActive ScreenSaver 
+		cp ./ProActiveScreenSaver /usr/libexec/xscreensaver/ProActive
+		chmod 755 /usr/libexec/xscreensaver/ProActive
+		chown root /usr/libexec/xscreensaver/ProActive
+		echo "./ProActiveScreenSaver => /usr/libexec/xscreensaver/ProActive [OK]"
+
+		# The ProActive ScreenSaver  .desktop
+		cp ./ProActiveScreenSaver.xml /usr/share/xscreensaver/config/ProActive.xml
+		chmod 644 /usr/share/xscreensaver/config/ProActive.xml
+		chown root /usr/share/xscreensaver/config/ProActive.xml
+		echo "./ProActiveScreenSaver.desktop => /usr/share/applications/screensavers/ProActive.desktop [OK]"
+
+		# autostart server at system boot for proactive user
+		comm="su proactive -c \'python $path/server.py clean\' >> /etc/rc.local"
+		sh -c "echo $comm"
+		comm="su proactive -c \'python $path/server.py start \&\' >> /etc/rc.local"
+		sh -c "echo $comm"
+		chmod +x /etc/rc.local
+		echo "commands for server startup => /etc/rc.local [OK]"
+	fi
+fi
 
 echo " "
 echo "*-------------------------------------*"
