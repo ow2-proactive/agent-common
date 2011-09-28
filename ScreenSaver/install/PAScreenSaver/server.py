@@ -177,7 +177,7 @@ class Server():
 
 if __name__ == "__main__":
 
-    main_dir = os.environ["PROACTIVESS"]
+    main_dir = "/usr/bin/ProActiveScreenSaver"
     file_name = main_dir + "/resource/pid.tmp"
 
 

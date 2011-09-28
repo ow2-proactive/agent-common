@@ -54,14 +54,14 @@ then
 	echo "./ProActiveScreenSaver.desktop => /usr/share/applications/screensavers/ProActive.desktop [OK]"
 
 	# autostart server at system boot for proactive user
-	cp ./ServeurProActiveScreenSaver.sh /etc/init.d/ServeurProActiveScreenSaver
-	comm="su proactive -c \'python $path/server.py clean\' >> /etc/init.d/ServeurProActiveScreenSaver"
+	cp ./ServerProActiveScreenSaver.sh /etc/init.d/ServerProActiveScreenSaver
+	comm="su proactive -c \'python $path/server.py clean\' >> /etc/init.d/ServerProActiveScreenSaver"
 	sh -c "echo $comm"
-	comm="su proactive -c \'python $path/server.py start \&\' >> /etc/init.d/ServeurProActiveScreenSaver"
+	comm="su proactive -c \'python $path/server.py start \&\' >> /etc/init.d/ServerProActiveScreenSaver"
 	sh -c "echo $comm"
-	update-rc.d ServeurProActiveScreenSaver defaults
-	chmod +x /etc/init.d/ServeurProActiveScreenSaver
-	echo "./ServeurProActiveScreenSaver.sh => /etc/init.d/ServerProActiveScreenSaver [OK]"
+	update-rc.d ServerProActiveScreenSaver defaults
+	chmod +x /etc/init.d/ServerProActiveScreenSaver
+	echo "./ServerProActiveScreenSaver.sh => /etc/init.d/ServerProActiveScreenSaver [OK]"
 
 else
 	distrib=`echo $tmp | grep Fedora`
