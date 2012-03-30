@@ -1,0 +1,16 @@
+
+# /GUI_Editor/
+/GUI_Editor/build
+/GUI_Editor/dist
+
+# /GUI_Editor/nbproject/
+/GUI_Editor/nbproject/private
+
+# /ScreenSaver/
+/ScreenSaver/build
+/ScreenSaver/dist
+
+# /ScreenSaver/nbproject/
+/ScreenSaver/nbproject/private
+
+# /ScreenSaver/resources/
